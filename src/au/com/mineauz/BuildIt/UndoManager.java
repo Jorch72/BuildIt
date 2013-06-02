@@ -7,7 +7,7 @@ import org.bukkit.OfflinePlayer;
 
 public class UndoManager
 {
-	public static int maxUndoSteps;
+	public static int maxUndoSteps = 20;
 	
 	private HashMap<OfflinePlayer, ArrayDeque<Snapshot>> mSteps;
 	private HashMap<OfflinePlayer, ArrayDeque<Snapshot>> mRedoSteps;

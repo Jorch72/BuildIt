@@ -10,7 +10,7 @@ import au.com.mineauz.BuildIt.pattern.Pattern;
 import au.com.mineauz.BuildIt.selection.Selection;
 import au.com.mineauz.BuildIt.types.BlockType;
 
-public class BlockChangeTask
+public class BlockChangeTask implements IncrementalTask
 {
 	private Selection mSelection;
 	private Pattern mPlacePattern;
@@ -38,6 +38,7 @@ public class BlockChangeTask
 		mProgress = mSelection.iterator();
 	}
 	
+	@Override
 	public void doSome()
 	{
 		if(!mProgress.hasNext())
@@ -61,6 +62,7 @@ public class BlockChangeTask
 		}
 	}
 	
+	@Override
 	public boolean isDone()
 	{
 		return !mProgress.hasNext();

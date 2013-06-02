@@ -1,26 +1,25 @@
 package au.com.mineauz.BuildIt;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.scheduler.BukkitTask;
 
-public class BlockChanger
+public class IncrementalTaskRunner
 {
-	private Set<BlockChangeTask> mAllTasks;
+	private List<IncrementalTask> mAllTasks;
 	private BukkitTask mTask;
 	
-	public static int maxChangesPerTick = 200;
+	public static int maxChangesPerTick = 1000;
 	
-	public BlockChanger()
+	public IncrementalTaskRunner()
 	{
-		mAllTasks = new HashSet<BlockChangeTask>();
+		mAllTasks = new ArrayList<IncrementalTask>();
 		mTask = null;
 	}
-	public void submit(BlockChangeTask task, OfflinePlayer owner )
+	public void submit(IncrementalTask task )
 	{
 		mAllTasks.add(task);
 		
@@ -48,15 +47,13 @@ public class BlockChanger
 	
 	private void processAll()
 	{
-		Iterator<BlockChangeTask> it = mAllTasks.iterator();
+		Iterator<IncrementalTask> it = mAllTasks.iterator();
 
-		int changesPerTask = maxChangesPerTick / Math.min(mAllTasks.size(), maxChangesPerTick);
-		
 		int changes = 0;
 		outer: while(it.hasNext() && changes < maxChangesPerTick)
 		{
-			BlockChangeTask task = it.next();
-			for(int i = 0; i < changesPerTask; ++i)
+			IncrementalTask task = it.next();
+			while(changes < maxChangesPerTick)
 			{
 				if(task.isDone())
 				{
@@ -66,9 +63,6 @@ public class BlockChanger
 				
 				task.doSome();
 				changes++;
-				
-				if(changes >= maxChangesPerTick)
-					break outer;
 			}
 		}
 		

@@ -42,7 +42,7 @@ public class SetCommand implements CommandExecutor
 			
 			BlockChangeTask task = new BlockChangeTask(sel, pattern);
 			BuildIt.instance.getUndoManager().addStep(Snapshot.create(sel), player);
-			BuildIt.instance.getBlockChanger().submit(task, player);
+			BuildIt.instance.getTaskRunner().submit(task);
 		}
 		catch(IllegalArgumentException e)
 		{

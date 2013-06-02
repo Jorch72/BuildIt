@@ -13,7 +13,7 @@ public class BuildIt extends JavaPlugin
 	public static BuildIt instance;
 	
 	private SelectionManager mSelections;
-	private BlockChanger mBlockChanger;
+	private IncrementalTaskRunner mTaskRunner;
 	private UndoManager mUndoManager;
 	
 	public BuildIt()
@@ -25,7 +25,7 @@ public class BuildIt extends JavaPlugin
 	public void onEnable()
 	{
 		mSelections = new SelectionManager(this);
-		mBlockChanger = new BlockChanger();
+		mTaskRunner = new IncrementalTaskRunner();
 		mUndoManager = new UndoManager();
 		
 		getCommand("/wand").setExecutor(new WandCommand());
@@ -39,10 +39,10 @@ public class BuildIt extends JavaPlugin
 	@Override
 	public void onDisable()
 	{
-		mBlockChanger.cancelAll();
+		mTaskRunner.cancelAll();
 	}
 	
 	public SelectionManager getSelectionManager() { return mSelections; }
-	public BlockChanger getBlockChanger() { return mBlockChanger; }
+	public IncrementalTaskRunner getTaskRunner() { return mTaskRunner; }
 	public UndoManager getUndoManager() { return mUndoManager; }
 }
