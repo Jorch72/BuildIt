@@ -10,6 +10,7 @@ commands:
     description: "Gives you a selection wand"
   /set:
     description: "Sets the selections contents to something"
-  /select:
-    description: "Change the selection mode"
-    aliases: /sel
+  /undo:
+    description: "Undoes the last action"
+  /redo:
+    description: "Redoes the last undone action"

@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import au.com.mineauz.BuildIt.BlockChangeTask;
 import au.com.mineauz.BuildIt.BuildIt;
+import au.com.mineauz.BuildIt.Snapshot;
 import au.com.mineauz.BuildIt.pattern.Pattern;
 import au.com.mineauz.BuildIt.pattern.TiledPattern;
 import au.com.mineauz.BuildIt.selection.Selection;
@@ -39,7 +40,8 @@ public class SetCommand implements CommandExecutor
 		{
 			Pattern pattern = TiledPattern.parse(args[0]);
 			
-			BlockChangeTask task = new BlockChangeTask(sel, pattern); 
+			BlockChangeTask task = new BlockChangeTask(sel, pattern);
+			BuildIt.instance.getUndoManager().addStep(Snapshot.create(sel), player);
 			BuildIt.instance.getBlockChanger().submit(task, player);
 		}
 		catch(IllegalArgumentException e)

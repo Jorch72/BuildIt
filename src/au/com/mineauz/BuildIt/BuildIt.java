@@ -2,7 +2,9 @@ package au.com.mineauz.BuildIt;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import au.com.mineauz.BuildIt.commands.RedoCommand;
 import au.com.mineauz.BuildIt.commands.SetCommand;
+import au.com.mineauz.BuildIt.commands.UndoCommand;
 import au.com.mineauz.BuildIt.commands.WandCommand;
 import au.com.mineauz.BuildIt.selection.SelectionManager;
 
@@ -12,6 +14,7 @@ public class BuildIt extends JavaPlugin
 	
 	private SelectionManager mSelections;
 	private BlockChanger mBlockChanger;
+	private UndoManager mUndoManager;
 	
 	public BuildIt()
 	{
@@ -23,9 +26,14 @@ public class BuildIt extends JavaPlugin
 	{
 		mSelections = new SelectionManager(this);
 		mBlockChanger = new BlockChanger();
+		mUndoManager = new UndoManager();
 		
 		getCommand("/wand").setExecutor(new WandCommand());
 		getCommand("/set").setExecutor(new SetCommand());
+		getCommand("/undo").setExecutor(new UndoCommand());
+		getCommand("/redo").setExecutor(new RedoCommand());
+		
+		
 	}
 	
 	@Override
@@ -36,4 +44,5 @@ public class BuildIt extends JavaPlugin
 	
 	public SelectionManager getSelectionManager() { return mSelections; }
 	public BlockChanger getBlockChanger() { return mBlockChanger; }
+	public UndoManager getUndoManager() { return mUndoManager; }
 }
