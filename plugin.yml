@@ -1,0 +1,15 @@
+name: BuildIt
+author: Schmoller
+
+version: 1.0
+
+main: au.com.mineauz.BuildIt.BuildIt
+
+commands:
+  /wand:
+    description: "Gives you a selection wand"
+  /set:
+    description: "Sets the selections contents to something"
+  /select:
+    description: "Change the selection mode"
+    aliases: /sel
