@@ -8,19 +8,21 @@ import org.bukkit.entity.Player;
 
 import au.com.mineauz.BuildIt.BlockChangeTask;
 import au.com.mineauz.BuildIt.BuildIt;
+import au.com.mineauz.BuildIt.Mask;
 import au.com.mineauz.BuildIt.Snapshot;
 import au.com.mineauz.BuildIt.pattern.Pattern;
 import au.com.mineauz.BuildIt.pattern.RandomPattern;
 import au.com.mineauz.BuildIt.pattern.SingleTypePattern;
 import au.com.mineauz.BuildIt.pattern.TiledPattern;
 import au.com.mineauz.BuildIt.selection.Selection;
+import au.com.mineauz.BuildIt.types.BlockType;
 
-public class SetCommand implements CommandExecutor
+public class ReplaceCommand implements CommandExecutor
 {
 	@Override
 	public boolean onCommand( CommandSender sender, Command command, String label, String[] args )
 	{
-		if(args.length != 1 && args.length != 2)
+		if(args.length != 2 && args.length != 3)
 			return false;
 		
 		if(!(sender instanceof Player))
@@ -41,18 +43,26 @@ public class SetCommand implements CommandExecutor
 		try
 		{
 			Pattern pattern;
+			Mask mask = new Mask(); 
 			
-			if(args[0].equalsIgnoreCase("tiled"))
-				pattern = TiledPattern.parse(args[1]);
+			// Parse the mask
+			String[] replaceIDs = args[0].split(",");
+			for(String id : replaceIDs)
+				mask.add(BlockType.parse(id));
+			
+			// Parse pattern
+			
+			if(args[1].equalsIgnoreCase("tiled"))
+				pattern = TiledPattern.parse(args[2]);
 			else
 			{
-				if(args[0].contains(","))
-					pattern = RandomPattern.parse(args[0]);
+				if(args[1].contains(","))
+					pattern = RandomPattern.parse(args[1]);
 				else
-					pattern = SingleTypePattern.parse(args[0]);
+					pattern = SingleTypePattern.parse(args[1]);
 			}
 			
-			BlockChangeTask task = new BlockChangeTask(sel, pattern);
+			BlockChangeTask task = new BlockChangeTask(sel, pattern, mask);
 			BuildIt.instance.getUndoManager().addStep(Snapshot.create(sel), player);
 			BuildIt.instance.getTaskRunner().submit(task);
 		}

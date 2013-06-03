@@ -75,6 +75,12 @@ public class Snapshot
 		{
 			return !mProgress.hasNext();
 		}
+
+		@Override
+		public float weight()
+		{
+			return 0.1f;
+		}
 		
 	}
 	
@@ -99,6 +105,12 @@ public class Snapshot
 		public boolean isDone()
 		{
 			return !mProgress.hasNext();
+		}
+
+		@Override
+		public float weight()
+		{
+			return 4;
 		}
 		
 	}

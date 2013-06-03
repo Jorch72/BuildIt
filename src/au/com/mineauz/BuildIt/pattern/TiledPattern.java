@@ -17,40 +17,9 @@ public class TiledPattern implements Pattern
 	@Override
 	public BlockType getBlockType( BlockVector offset )
 	{
-		if(offset.getBlockX() % 2 == 0)
-		{
-			if(offset.getBlockZ() % 2 == 0)
-			{
-				if(offset.getBlockY() % 2 == 0)
-					return mA;
-				else
-					return mB;
-			}
-			else
-			{
-				if(offset.getBlockY() % 2 == 0)
-					return mB;
-				else
-					return mA;
-			}
-		}
-		else
-		{
-			if(offset.getBlockZ() % 2 == 0)
-			{
-				if(offset.getBlockY() % 2 == 0)
-					return mB;
-				else
-					return mA;
-			}
-			else
-			{
-				if(offset.getBlockY() % 2 == 0)
-					return mA;
-				else
-					return mB;
-			}
-		}
+		if((offset.getBlockX() + offset.getBlockY() + offset.getBlockZ()) % 2 == 0)
+			return mA;
+		return mB;
 	}
 	
 	public static TiledPattern parse(String patternString) throws IllegalArgumentException

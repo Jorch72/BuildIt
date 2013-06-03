@@ -12,7 +12,7 @@ public class IncrementalTaskRunner
 	private List<IncrementalTask> mAllTasks;
 	private BukkitTask mTask;
 	
-	public static int maxChangesPerTick = 1000;
+	public static int maxChangesPerTick = 4000;
 	
 	public IncrementalTaskRunner()
 	{
@@ -49,7 +49,7 @@ public class IncrementalTaskRunner
 	{
 		Iterator<IncrementalTask> it = mAllTasks.iterator();
 
-		int changes = 0;
+		double changes = 0;
 		outer: while(it.hasNext() && changes < maxChangesPerTick)
 		{
 			IncrementalTask task = it.next();
@@ -62,7 +62,7 @@ public class IncrementalTaskRunner
 				}
 				
 				task.doSome();
-				changes++;
+				changes += task.weight();
 			}
 		}
 		

@@ -37,14 +37,37 @@ public class Mask
 		mFilterTypes.clear();
 	}
 	
-	public boolean isPresent(BlockType type)
+	public boolean isPresent(BlockType other)
 	{
-		return mFilterTypes.contains(type);
+		for(BlockType type : mFilterTypes)
+		{
+			if(!type.getMaterial().equals(other.getMaterial()))
+				continue;
+			
+			if(type.getData() == -1)
+				return true;
+			
+			if(type.getData() == other.getData())
+				return true;
+		}
+		
+		return false;
 	}
 	
 	public boolean isPresent(Block block)
 	{
-		return mFilterTypes.contains(new BlockType(block.getType(), block.getData()));
+		for(BlockType type : mFilterTypes)
+		{
+			if(!type.getMaterial().equals(block.getType()))
+				continue;
+			
+			if(type.getData() == -1)
+				return true;
+			
+			if(type.getData() == block.getData())
+				return true;
+		}
+		return false;
 	}
 	
 	public boolean isEmpty()

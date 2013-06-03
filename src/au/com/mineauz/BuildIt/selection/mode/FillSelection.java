@@ -1,9 +1,9 @@
 package au.com.mineauz.BuildIt.selection.mode;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.util.BlockVector;
 
 import au.com.mineauz.BuildIt.MessageHandler;
@@ -12,13 +12,6 @@ import au.com.mineauz.BuildIt.selection.Selection;
 //TODO:
 public class FillSelection implements Selection
 {
-
-	@Override
-	public List<BlockVector> getPoints()
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public BlockVector getMinPoint()
@@ -73,5 +66,26 @@ public class FillSelection implements Selection
 	public FillSelection clone()
 	{
 		return null;
+	}
+
+	@Override
+	public void offset( BlockVector pos )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void scale( BlockVector amount )
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void expand( BlockFace dir, int amount )
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

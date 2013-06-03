@@ -1,21 +1,21 @@
 package au.com.mineauz.BuildIt.selection.mode;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.util.BlockVector;
 
 import au.com.mineauz.BuildIt.MessageHandler;
 import au.com.mineauz.BuildIt.selection.Selection;
 import au.com.mineauz.BuildIt.selection.SelectionManager;
 
+//TODO: Make this an ellipse
 public class SphereSelection implements Selection
 {
 	private World mWorld;
 	private BlockVector mCenter;
-	private BlockVector mRadiusMarker;
 	private double mRadius;
 	
 	private int mNext;
@@ -26,18 +26,6 @@ public class SphereSelection implements Selection
 		mCenter = null;
 		
 		mNext = 0;
-	}
-	
-	@Override
-	public List<BlockVector> getPoints()
-	{
-		List<BlockVector> list = new ArrayList<BlockVector>();
-		if(mCenter != null)
-			list.add(mCenter);
-		if(mRadiusMarker != null)
-			list.add(mRadiusMarker);
-		
-		return list;
 	}
 
 	@Override
@@ -74,8 +62,7 @@ public class SphereSelection implements Selection
 		}
 		else if(mNext == 1)
 		{
-			mRadiusMarker = point;
-			mRadius = mRadiusMarker.distance(mCenter);
+			mRadius = point.distance(mCenter);
 			
 			messages.addMessage("Radius Set to %d", (int)mRadius);
 		}
@@ -105,8 +92,26 @@ public class SphereSelection implements Selection
 		sel.mCenter = mCenter.clone();
 		sel.mNext = mNext;
 		sel.mRadius = mRadius;
-		sel.mRadiusMarker = mRadiusMarker.clone();
-		
+
 		return sel;
+	}
+
+	@Override
+	public void offset( BlockVector pos )
+	{
+		Validate.isTrue(isComplete());
+		mCenter.add(pos);
+	}
+
+	@Override
+	public void scale( BlockVector amount )
+	{
+		mRadius *= amount.length();
+	}
+
+	@Override
+	public void expand( BlockFace dir, int amount )
+	{
+		mRadius += amount;
 	}
 }

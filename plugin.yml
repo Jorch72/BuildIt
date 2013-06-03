@@ -10,7 +10,11 @@ commands:
     description: "Gives you a selection wand"
   /set:
     description: "Sets the selections contents to something"
+  /replace:
+    description: "Replaces the selections contents with something"
   /undo:
     description: "Undoes the last action"
   /redo:
     description: "Redoes the last undone action"
+  /offset:
+    description: "Offsets the current selection"

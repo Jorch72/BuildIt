@@ -1,10 +1,10 @@
 package au.com.mineauz.BuildIt.selection.mode;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.util.BlockVector;
 import org.bukkit.util.Vector;
 
@@ -27,18 +27,6 @@ public class ExtendSelection implements Selection
 		mMax = null;
 		
 		mNext = 0;
-	}
-	
-	@Override
-	public List<BlockVector> getPoints()
-	{
-		List<BlockVector> list = new ArrayList<BlockVector>();
-		if(mMin != null)
-			list.add(mMin);
-		if(mMax != null)
-			list.add(mMax);
-		
-		return list;
 	}
 
 	@Override
@@ -109,5 +97,50 @@ public class ExtendSelection implements Selection
 		sel.mNext = mNext;
 		
 		return sel;
+	}
+
+	@Override
+	public void offset( BlockVector pos )
+	{
+		Validate.isTrue(isComplete());
+		
+		mMax.add(pos);
+		mMin.add(pos);
+	}
+
+	@Override
+	public void scale( BlockVector amount )
+	{
+		Validate.isTrue(isComplete());
+	}
+
+	@Override
+	public void expand( BlockFace dir, int amount )
+	{
+		Validate.isTrue(isComplete());
+		
+		switch(dir)
+		{
+		case DOWN:
+			mMin.setY(mMin.getY() - amount);
+			break;
+		case EAST:
+			mMax.setX(mMax.getX() + amount);
+			break;
+		case NORTH:
+			mMax.setZ(mMax.getZ() + amount);
+			break;
+		case SOUTH:
+			mMin.setZ(mMin.getZ() - amount);
+			break;
+		case UP:
+			mMax.setY(mMax.getY() + amount);
+			break;
+		case WEST:
+			mMin.setX(mMin.getX() + amount);
+			break;
+		default:
+			break;
+		}
 	}
 }

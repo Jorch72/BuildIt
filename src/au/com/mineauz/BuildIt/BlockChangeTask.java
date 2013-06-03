@@ -67,5 +67,11 @@ public class BlockChangeTask implements IncrementalTask
 	{
 		return !mProgress.hasNext();
 	}
+
+	@Override
+	public float weight()
+	{
+		return 4f;
+	}
 	
 }

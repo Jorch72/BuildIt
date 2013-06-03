@@ -5,4 +5,6 @@ public interface IncrementalTask
 	public void doSome();
 	
 	public boolean isDone();
+	
+	public float weight();
 }

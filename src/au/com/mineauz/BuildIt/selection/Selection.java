@@ -1,17 +1,15 @@
 package au.com.mineauz.BuildIt.selection;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.util.BlockVector;
 
 import au.com.mineauz.BuildIt.MessageHandler;
 
 public interface Selection extends Iterable<BlockVector>, Cloneable
 {
-	public List<BlockVector> getPoints();
-	
 	public BlockVector getMinPoint();
 	
 	public BlockVector getMaxPoint();
@@ -31,4 +29,10 @@ public interface Selection extends Iterable<BlockVector>, Cloneable
 	public Iterator<BlockVector> iterator();
 	
 	public Selection clone();
+	
+	public void offset(BlockVector pos);
+	
+	public void scale(BlockVector amount);
+	
+	public void expand(BlockFace dir, int amount);
 }

@@ -1,11 +1,10 @@
 package au.com.mineauz.BuildIt.selection.mode;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.util.BlockVector;
 
 import au.com.mineauz.BuildIt.MessageHandler;
@@ -27,13 +26,6 @@ public class Cutaway implements Selection
 		
 		mA = a;
 		mB = b;
-	}
-	@Override
-	public List<BlockVector> getPoints()
-	{
-		ArrayList<BlockVector> points = new ArrayList<BlockVector>(mA.getPoints());
-		points.addAll(mB.getPoints());
-		return points;
 	}
 
 	@Override
@@ -95,5 +87,25 @@ public class Cutaway implements Selection
 	{
 		Cutaway sel = new Cutaway(mA.clone(), mB.clone());
 		return sel;
+	}
+
+	@Override
+	public void offset( BlockVector pos )
+	{
+		mA.offset(pos);
+		mB.offset(pos);
+	}
+
+	@Override
+	public void scale( BlockVector amount )
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void expand( BlockFace dir, int amount )
+	{
+		mA.expand(dir, amount);
+		mB.expand(dir, amount);
 	}
 }

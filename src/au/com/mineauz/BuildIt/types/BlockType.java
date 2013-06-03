@@ -210,7 +210,7 @@ public class BlockType
 			}
 		}
 		else
-			itemData = 0;
+			itemData = -1;
 		
 		Material mat = Material.getMaterial(itemId); 
 		
@@ -251,7 +251,10 @@ public class BlockType
 	
 	public void apply(Block block)
 	{
-		block.setTypeIdAndData(mMaterial.getId(), mData, false);
+		if(mData == -1)
+			block.setTypeIdAndData(mMaterial.getId(), (byte)0, false);
+		else
+			block.setTypeIdAndData(mMaterial.getId(), mData, false);
 	}
 	
 	@Override

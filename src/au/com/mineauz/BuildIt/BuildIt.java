@@ -2,7 +2,9 @@ package au.com.mineauz.BuildIt;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import au.com.mineauz.BuildIt.commands.OffsetCommand;
 import au.com.mineauz.BuildIt.commands.RedoCommand;
+import au.com.mineauz.BuildIt.commands.ReplaceCommand;
 import au.com.mineauz.BuildIt.commands.SetCommand;
 import au.com.mineauz.BuildIt.commands.UndoCommand;
 import au.com.mineauz.BuildIt.commands.WandCommand;
@@ -32,8 +34,8 @@ public class BuildIt extends JavaPlugin
 		getCommand("/set").setExecutor(new SetCommand());
 		getCommand("/undo").setExecutor(new UndoCommand());
 		getCommand("/redo").setExecutor(new RedoCommand());
-		
-		
+		getCommand("/offset").setExecutor(new OffsetCommand());
+		getCommand("/replace").setExecutor(new ReplaceCommand());
 	}
 	
 	@Override
