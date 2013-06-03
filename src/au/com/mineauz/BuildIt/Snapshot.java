@@ -3,11 +3,14 @@ package au.com.mineauz.BuildIt;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.util.BlockVector;
 
 import au.com.mineauz.BuildIt.selection.Selection;
+import au.com.mineauz.BuildIt.types.BlockType;
 
 public class Snapshot
 {
@@ -36,7 +39,12 @@ public class Snapshot
 	 */
 	public void restore()
 	{
-		BuildIt.instance.getTaskRunner().submit(new SnapshotRestorer());
+		BuildIt.instance.getTaskRunner().submit(new SnapshotRestorer(true));
+	}
+	
+	public void restore(BlockVector offset, World world, boolean includeAir)
+	{
+		BuildIt.instance.getTaskRunner().submit(new SnapshotRestorer(offset, world, includeAir));
 	}
 	
 	public boolean isReady()
@@ -87,10 +95,25 @@ public class Snapshot
 	private class SnapshotRestorer implements IncrementalTask
 	{
 		private Iterator<BlockState> mProgress;
+		private boolean mAir;
 		
-		public SnapshotRestorer()
+		private BlockVector mOffset;
+		private World mWorld;
+		
+		public SnapshotRestorer(boolean includeAir)
 		{
 			mProgress = mStates.iterator();
+			mAir = includeAir;
+			
+			mOffset = null;
+			mWorld = null;
+		}
+		public SnapshotRestorer(BlockVector offset, World world, boolean includeAir)
+		{
+			mProgress = mStates.iterator();
+			mAir = includeAir;
+			mOffset = offset;
+			mWorld = world;
 		}
 		
 		@Override
@@ -98,7 +121,27 @@ public class Snapshot
 		{
 			BlockState block = mProgress.next();
 			
-			block.update(true);
+			while(!mAir && block.getType() == Material.AIR)
+			{
+				if(mProgress.hasNext())
+					block = mProgress.next();
+				else
+					return;
+			}
+			
+			if(mOffset != null)
+			{
+				BlockType type = BlockType.fromState(block);
+				
+				BlockVector pos = block.getLocation().toVector().add(mOffset).toBlockVector();
+				
+				Block b = mWorld.getBlockAt(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
+				type.apply(b);
+			}
+			else
+			{
+				block.update(true);
+			}
 		}
 
 		@Override

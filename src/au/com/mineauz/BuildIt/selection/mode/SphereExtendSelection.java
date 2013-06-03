@@ -12,7 +12,7 @@ import au.com.mineauz.BuildIt.selection.Selection;
 import au.com.mineauz.BuildIt.selection.SelectionManager;
 
 //TODO: Make this an ellipse
-public class SphereSelection implements Selection
+public class SphereExtendSelection implements Selection
 {
 	private World mWorld;
 	private BlockVector mCenter;
@@ -20,7 +20,7 @@ public class SphereSelection implements Selection
 	
 	private int mNext;
 	
-	public SphereSelection(World world)
+	public SphereExtendSelection(World world)
 	{
 		mWorld = world;
 		mCenter = null;
@@ -64,13 +64,19 @@ public class SphereSelection implements Selection
 		if(mNext == 0)
 		{
 			mCenter = point;
+			mRadius = 0;
 			messages.addMessage("Center set to %d,%d,%d", point.getBlockX(), point.getBlockY(), point.getBlockZ());
 		}
-		else if(mNext == 1)
+		else if(mNext >= 1)
 		{
-			mRadius = point.distance(mCenter);
-			
-			messages.addMessage("Radius Set to %d", (int)mRadius);
+			double radius = point.distance(mCenter);
+			if(radius > mRadius)
+			{
+				mRadius = point.distance(mCenter);
+				messages.addMessage("Radius Set to %d", (int)mRadius);
+			}
+			else
+				return false;
 		}
 		else
 			return false;
@@ -82,7 +88,7 @@ public class SphereSelection implements Selection
 	@Override
 	public boolean isComplete()
 	{
-		return mNext == 2;
+		return mNext >= 1;
 	}
 	
 	@Override
@@ -92,9 +98,9 @@ public class SphereSelection implements Selection
 	}
 	
 	@Override
-	public SphereSelection clone()
+	public SphereExtendSelection clone()
 	{
-		SphereSelection sel = new SphereSelection(mWorld);
+		SphereExtendSelection sel = new SphereExtendSelection(mWorld);
 		sel.mCenter = mCenter.clone();
 		sel.mNext = mNext;
 		sel.mRadius = mRadius;

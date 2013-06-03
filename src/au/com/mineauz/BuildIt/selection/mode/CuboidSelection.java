@@ -46,6 +46,11 @@ public class CuboidSelection implements Selection
 	{
 		return mWorld;
 	}
+	@Override
+	public void setWorld( World world )
+	{
+		mWorld = world;
+	}
 
 	@Override
 	public boolean isInSelection( BlockVector pos )

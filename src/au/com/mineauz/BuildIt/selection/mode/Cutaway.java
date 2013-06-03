@@ -45,6 +45,13 @@ public class Cutaway implements Selection
 	{
 		return mA.getWorld();
 	}
+	
+	@Override
+	public void setWorld( World world )
+	{
+		mA.setWorld(world);
+		mB.setWorld(world);
+	}
 
 	@Override
 	public boolean isInSelection( BlockVector pos )

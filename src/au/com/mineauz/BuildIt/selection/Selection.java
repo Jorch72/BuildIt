@@ -15,6 +15,7 @@ public interface Selection extends Iterable<BlockVector>, Cloneable
 	public BlockVector getMaxPoint();
 	
 	public World getWorld();
+	public void setWorld(World world);
 	
 	/**
 	 * This is called to do a fine check that the point is in the selection. By this point, it is already known to be within the bounding box of the selection

@@ -10,7 +10,8 @@ public enum SelectMode
 {
 	Cuboid("Cuboid", CuboidSelection.class),
 	Extend("Extend", ExtendSelection.class),
-	Sphere("Sphere", SphereSelection.class);
+	Sphere("Sphere", SphereSelection.class),
+	SphereExtend("Sphere Extend", SphereExtendSelection.class);
 	
 	private Constructor<? extends Selection> mConstructor;
 	private String mName;

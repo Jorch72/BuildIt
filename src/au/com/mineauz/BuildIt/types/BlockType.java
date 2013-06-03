@@ -4,6 +4,8 @@ import org.bukkit.Material;
 import org.bukkit.SkullType;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Skull;
 import org.bukkit.inventory.ItemStack;
 
 public class BlockType
@@ -37,6 +39,20 @@ public class BlockType
 			throw new IllegalArgumentException("The material of that itemstack is not a block");
 		
 		return new BlockType(stack.getType(), (byte)stack.getDurability());
+	}
+	
+	public static BlockType fromState(BlockState state)
+	{
+		BlockType type;
+		if(state instanceof Skull)
+		{
+			type = new SkullBlockType(((Skull)state).getSkullType(), ((Skull)state).getRotation(), ((Skull)state).getOwner());
+			type.mData = state.getData().getData();
+		}
+		else
+			type = new BlockType(state.getType(), state.getData().getData());
+				
+		return type;
 	}
 	
 	public static BlockType parse(String id) throws IllegalArgumentException

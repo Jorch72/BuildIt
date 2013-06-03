@@ -18,3 +18,9 @@ commands:
     description: "Redoes the last undone action"
   /offset:
     description: "Offsets the current selection"
+  /copy:
+    description: "Copies the selection"
+  /cut:
+    description: "Cuts the selection"
+  /paste:
+    description: "Pastes the selection"

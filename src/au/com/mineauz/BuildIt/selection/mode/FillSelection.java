@@ -33,6 +33,12 @@ public class FillSelection implements Selection
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override
+	public void setWorld( World world )
+	{
+		// TODO Auto-generated method stub
+		
+	}
 
 	@Override
 	public boolean isInSelection( BlockVector pos )
