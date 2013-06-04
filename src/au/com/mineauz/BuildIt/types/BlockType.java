@@ -5,7 +5,17 @@ import org.bukkit.SkullType;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.BrewingStand;
+import org.bukkit.block.Chest;
+import org.bukkit.block.CommandBlock;
+import org.bukkit.block.CreatureSpawner;
+import org.bukkit.block.Furnace;
+import org.bukkit.block.Jukebox;
+import org.bukkit.block.NoteBlock;
+import org.bukkit.block.Sign;
 import org.bukkit.block.Skull;
+import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 public class BlockType
@@ -49,6 +59,24 @@ public class BlockType
 			type = new SkullBlockType(((Skull)state).getSkullType(), ((Skull)state).getRotation(), ((Skull)state).getOwner());
 			type.mData = state.getData().getData();
 		}
+		else if(state instanceof CommandBlock)
+			type = new CommandBlockType(((CommandBlock)state).getName(), ((CommandBlock)state).getCommand());
+		else if(state instanceof CreatureSpawner)
+			type = new SpawnerBlockType(((CreatureSpawner)state).getSpawnedType(), ((CreatureSpawner)state).getDelay());
+		else if(state instanceof Jukebox)
+			type = new JukeboxType(((Jukebox)state).getPlaying());
+		else if(state instanceof NoteBlock)
+			type = new NoteBlockType(((NoteBlock)state).getNote());
+		else if(state instanceof Sign)
+			type = new SignBlockType(state.getType(), state.getData().getData(), ((Sign)state).getLines());
+		else if(state instanceof BrewingStand)
+			type = new BrewingStandType(((BrewingStand)state).getBrewingTime(), ((BrewingStand)state).getInventory());
+		else if(state instanceof Furnace)
+			type = new FurnaceType(state.getType(), ((Furnace)state).getCookTime(), ((Furnace)state).getBurnTime());
+		else if(state instanceof Chest)
+			type = new InventoryHolderBlockType(state.getType(), state.getData().getData(), ((Chest)state).getBlockInventory());
+		else if(state instanceof InventoryHolder)
+			type = new InventoryHolderBlockType(state.getType(), state.getData().getData(), ((InventoryHolder)state).getInventory());
 		else
 			type = new BlockType(state.getType(), state.getData().getData());
 				
@@ -259,6 +287,32 @@ public class BlockType
 						throw new IllegalArgumentException("Unknown block face " + data[2]);
 					}
 				}
+			}
+			else if(mat == Material.MOB_SPAWNER)
+			{
+				EntityType entityType = EntityType.fromName(data[1]);
+				if(entityType == null)
+					throw new IllegalArgumentException("Unknown entity type " + data[1]);
+				
+				if(!entityType.isSpawnable() || !entityType.isAlive() || entityType == EntityType.ENDER_DRAGON || entityType == EntityType.WITHER)
+					throw new IllegalArgumentException("Cannot use " + data[1]);
+				
+				int delay = -1;
+				if(data.length > 2)
+				{
+					try
+					{
+						delay = Integer.parseInt(data[2]);
+						if(delay < 0)
+							throw new IllegalArgumentException("Cannot have a negative delay");
+					}
+					catch(NumberFormatException e)
+					{
+						throw new IllegalArgumentException("Expected spawn delay as second argument");
+					}
+				}
+				
+				type = new SpawnerBlockType(entityType, delay);
 			}
 		}
 		

@@ -4,6 +4,9 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 
 import org.bukkit.OfflinePlayer;
+import org.bukkit.util.Vector;
+
+import au.com.mineauz.BuildIt.selection.Selection;
 
 public class UndoManager
 {
@@ -53,6 +56,28 @@ public class UndoManager
 			steps.pollLast();
 		
 		steps.push(snapshot);
+	}
+	
+	public boolean addStep(Selection selection, OfflinePlayer player)
+	{
+		Vector delta = selection.getMaxPoint().clone().subtract(selection.getMinPoint());
+		int vol = delta.getBlockX() * delta.getBlockY() * delta.getBlockZ();
+		
+		if(vol > 10000000)
+			return false;
+		
+		Snapshot snap = Snapshot.create(selection);
+		ArrayDeque<Snapshot> redoSteps = getRedoSteps(player);
+		redoSteps.clear();
+		
+		ArrayDeque<Snapshot> steps = getSteps(player);
+		
+		if(steps.size() >= maxUndoSteps)
+			steps.pollLast();
+		
+		steps.push(snap);
+		
+		return true;
 	}
 	
 	public void undoStep(OfflinePlayer player)

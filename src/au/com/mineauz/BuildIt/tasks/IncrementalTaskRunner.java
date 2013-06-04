@@ -1,4 +1,4 @@
-package au.com.mineauz.BuildIt;
+package au.com.mineauz.BuildIt.tasks;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
+
+import au.com.mineauz.BuildIt.BuildIt;
 
 public class IncrementalTaskRunner
 {
@@ -61,8 +63,7 @@ public class IncrementalTaskRunner
 					continue outer;
 				}
 				
-				task.doSome();
-				changes += task.weight();
+				changes += task.doSome();
 			}
 		}
 		

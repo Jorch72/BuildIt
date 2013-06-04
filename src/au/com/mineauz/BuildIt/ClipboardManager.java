@@ -10,6 +10,7 @@ import org.bukkit.util.BlockVector;
 
 import au.com.mineauz.BuildIt.pattern.SingleTypePattern;
 import au.com.mineauz.BuildIt.selection.Selection;
+import au.com.mineauz.BuildIt.tasks.BlockChangeTask;
 import au.com.mineauz.BuildIt.types.BlockType;
 
 public class ClipboardManager

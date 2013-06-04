@@ -10,6 +10,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.util.BlockVector;
 
 import au.com.mineauz.BuildIt.selection.Selection;
+import au.com.mineauz.BuildIt.tasks.IncrementalTask;
 import au.com.mineauz.BuildIt.types.BlockType;
 
 public class Snapshot
@@ -67,7 +68,7 @@ public class Snapshot
 		}
 		
 		@Override
-		public void doSome()
+		public float doSome()
 		{
 			BlockVector point = mProgress.next();
 			
@@ -76,6 +77,8 @@ public class Snapshot
 			
 			if(isDone())
 				mReady = true;
+			
+			return 0.5f;
 		}
 
 		@Override
@@ -84,12 +87,6 @@ public class Snapshot
 			return !mProgress.hasNext();
 		}
 
-		@Override
-		public float weight()
-		{
-			return 0.1f;
-		}
-		
 	}
 	
 	private class SnapshotRestorer implements IncrementalTask
@@ -117,7 +114,7 @@ public class Snapshot
 		}
 		
 		@Override
-		public void doSome()
+		public float doSome()
 		{
 			BlockState block = mProgress.next();
 			
@@ -126,7 +123,7 @@ public class Snapshot
 				if(mProgress.hasNext())
 					block = mProgress.next();
 				else
-					return;
+					return 0;
 			}
 			
 			if(mOffset != null)
@@ -142,6 +139,8 @@ public class Snapshot
 			{
 				block.update(true);
 			}
+			
+			return 4;
 		}
 
 		@Override
@@ -149,12 +148,5 @@ public class Snapshot
 		{
 			return !mProgress.hasNext();
 		}
-
-		@Override
-		public float weight()
-		{
-			return 4;
-		}
-		
 	}
 }

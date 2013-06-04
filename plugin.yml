@@ -7,20 +7,30 @@ main: au.com.mineauz.BuildIt.BuildIt
 
 commands:
   /wand:
-    description: "Gives you a selection wand"
   /set:
-    description: "Sets the selections contents to something"
   /replace:
-    description: "Replaces the selections contents with something"
+  /naturalize:
   /undo:
-    description: "Undoes the last action"
   /redo:
-    description: "Redoes the last undone action"
   /offset:
-    description: "Offsets the current selection"
   /copy:
-    description: "Copies the selection"
-  /cut:
-    description: "Cuts the selection"
+  /cut: 
   /paste:
-    description: "Pastes the selection"
+
+permissions:
+   buildit.wand:
+     default: op
+   buildit.copy:
+     default: op
+   buildit.cut:
+     default: op
+   buildit.paste:
+     default: op
+   buildit.undo:
+     default: op
+   buildit.set:
+     default: op
+   buildit.replace:
+     default: op
+   buildit.naturalize:
+     default: op

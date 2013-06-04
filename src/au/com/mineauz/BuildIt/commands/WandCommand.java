@@ -1,13 +1,14 @@
 package au.com.mineauz.BuildIt.commands;
 
+import java.util.List;
+
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import au.com.mineauz.BuildIt.selection.SelectionManager;
 
-public class WandCommand implements CommandExecutor
+public class WandCommand implements ICommandDescription
 {
 	@Override
 	public boolean onCommand( CommandSender sender, Command command, String label, String[] args )
@@ -36,6 +37,36 @@ public class WandCommand implements CommandExecutor
 			player.getInventory().addItem(SelectionManager.makeWand());
 
 		return true;
+	}
+
+	@Override
+	public List<String> onTabComplete( CommandSender sender, Command command, String alias, String[] args )
+	{
+		return null;
+	}
+
+	@Override
+	public String getDescription()
+	{
+		return "Gives you the wand, or takes it from you";
+	}
+
+	@Override
+	public String getPermission()
+	{
+		return "buildit.wand";
+	}
+
+	@Override
+	public String[] getAliases()
+	{
+		return null;
+	}
+
+	@Override
+	public String getUsage()
+	{
+		return "/<command>";
 	}
 
 }

@@ -1,9 +1,10 @@
 package au.com.mineauz.BuildIt.commands;
 
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockVector;
@@ -11,7 +12,7 @@ import org.bukkit.util.BlockVector;
 import au.com.mineauz.BuildIt.BuildIt;
 import au.com.mineauz.BuildIt.selection.Selection;
 
-public class OffsetCommand implements CommandExecutor
+public class OffsetCommand implements ICommandDescription
 {
 	@Override
 	public boolean onCommand( CommandSender sender, Command command, String label, String[] args )
@@ -123,6 +124,36 @@ public class OffsetCommand implements CommandExecutor
 		sender.sendMessage("Selection offset " + amount + " units " + direction.toString().toLowerCase().replaceAll("_", " "));
 		
 		return true;
+	}
+
+	@Override
+	public List<String> onTabComplete( CommandSender sender, Command command, String alias, String[] args )
+	{
+		return null;
+	}
+
+	@Override
+	public String getDescription()
+	{
+		return "Moves the selection";
+	}
+
+	@Override
+	public String getPermission()
+	{
+		return "buildit.offset";
+	}
+
+	@Override
+	public String[] getAliases()
+	{
+		return null;
+	}
+
+	@Override
+	public String getUsage()
+	{
+		return "/<command> {amount} {direction}";
 	}
 
 }

@@ -380,13 +380,31 @@ public class SelectionManager implements Listener
 	private static class SelIterator implements Iterator<BlockVector>
 	{
 		private BlockVector mVec;
+		private BlockVector mMin;
+		private BlockVector mMax;
 		
 		private Selection mSel;
 		
 		public SelIterator(Selection sel)
 		{
 			mSel = sel;
-			mVec = (BlockVector) sel.getMinPoint().clone().setX(sel.getMinPoint().getBlockX()-1);
+			
+			mMin = sel.getMinPoint().clone();
+			mMax = sel.getMaxPoint().clone();
+			
+			if(mMin.getBlockY() < 0)
+				mMin.setY(0);
+			
+			if(mMin.getBlockY() > 255)
+				mMin.setY(255);
+			
+			if(mMax.getBlockY() < 0)
+				mMax.setY(0);
+			
+			if(mMax.getBlockY() > 255)
+				mMax.setY(255);
+			
+			mVec = (BlockVector) mMin.clone().setX(mMin.getBlockX()-1);
 		}
 		
 		@Override
@@ -412,16 +430,16 @@ public class SelectionManager implements Listener
 		{
 			vec.setX(vec.getBlockX()+1);
 			
-			if(vec.getBlockX() > mSel.getMaxPoint().getBlockX())
+			if(vec.getBlockX() > mMax.getBlockX())
 			{
-				vec.setX(mSel.getMinPoint().getBlockX());
+				vec.setX(mMin.getBlockX());
 				vec.setZ(vec.getBlockZ()+1);
 				
-				if(vec.getBlockZ() > mSel.getMaxPoint().getBlockZ())
+				if(vec.getBlockZ() > mMax.getBlockZ())
 				{
-					vec.setZ(mSel.getMinPoint().getBlockZ());
+					vec.setZ(mMin.getBlockZ());
 					
-					if(vec.getBlockY() == mSel.getMaxPoint().getBlockY())
+					if(vec.getBlockY() == mMax.getBlockY())
 						return false;
 					
 					vec.setY(vec.getBlockY()+1);

@@ -1,21 +1,21 @@
 package au.com.mineauz.BuildIt.commands;
 
+import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import au.com.mineauz.BuildIt.BlockChangeTask;
 import au.com.mineauz.BuildIt.BuildIt;
-import au.com.mineauz.BuildIt.Snapshot;
 import au.com.mineauz.BuildIt.pattern.Pattern;
 import au.com.mineauz.BuildIt.pattern.RandomPattern;
 import au.com.mineauz.BuildIt.pattern.SingleTypePattern;
 import au.com.mineauz.BuildIt.pattern.TiledPattern;
 import au.com.mineauz.BuildIt.selection.Selection;
+import au.com.mineauz.BuildIt.tasks.BlockChangeTask;
 
-public class SetCommand implements CommandExecutor
+public class SetCommand implements ICommandDescription
 {
 	@Override
 	public boolean onCommand( CommandSender sender, Command command, String label, String[] args )
@@ -53,7 +53,8 @@ public class SetCommand implements CommandExecutor
 			}
 			
 			BlockChangeTask task = new BlockChangeTask(sel, pattern);
-			BuildIt.instance.getUndoManager().addStep(Snapshot.create(sel), player);
+			if(!BuildIt.instance.getUndoManager().addStep(sel, player))
+				sender.sendMessage(ChatColor.GOLD + "WARNING: The selection is too large to be undone");
 			BuildIt.instance.getTaskRunner().submit(task);
 		}
 		catch(IllegalArgumentException e)
@@ -62,6 +63,36 @@ public class SetCommand implements CommandExecutor
 		}
 		
 		return true;
+	}
+
+	@Override
+	public List<String> onTabComplete( CommandSender sender, Command command, String alias, String[] args )
+	{
+		return null;
+	}
+
+	@Override
+	public String getDescription()
+	{
+		return "Sets the contents of a selection to something";
+	}
+
+	@Override
+	public String getPermission()
+	{
+		return "buildit.set";
+	}
+
+	@Override
+	public String[] getAliases()
+	{
+		return null;
+	}
+
+	@Override
+	public String getUsage()
+	{
+		return "/<command> {pattern}";
 	}
 
 }

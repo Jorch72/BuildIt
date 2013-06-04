@@ -1,4 +1,4 @@
-package au.com.mineauz.BuildIt;
+package au.com.mineauz.BuildIt.tasks;
 
 import java.util.Iterator;
 
@@ -6,6 +6,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.block.Block;
 import org.bukkit.util.BlockVector;
 
+import au.com.mineauz.BuildIt.Mask;
 import au.com.mineauz.BuildIt.pattern.Pattern;
 import au.com.mineauz.BuildIt.selection.Selection;
 import au.com.mineauz.BuildIt.types.BlockType;
@@ -39,12 +40,16 @@ public class BlockChangeTask implements IncrementalTask
 	}
 	
 	@Override
-	public void doSome()
+	public float doSome()
 	{
 		if(!mProgress.hasNext())
-			return;
+			return 0;
 		
 		BlockVector loc = mProgress.next();
+		
+		
+		if(loc.getBlockY() < 0 || loc.getBlockY() > 256)
+			return 0;
 		
 		Block block = mSelection.getWorld().getBlockAt(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 		
@@ -57,9 +62,11 @@ public class BlockChangeTask implements IncrementalTask
 			}
 			catch(Exception e)
 			{
-				
+				return 0;
 			}
 		}
+		
+		return 4;
 	}
 	
 	@Override
@@ -67,11 +74,4 @@ public class BlockChangeTask implements IncrementalTask
 	{
 		return !mProgress.hasNext();
 	}
-
-	@Override
-	public float weight()
-	{
-		return 4f;
-	}
-	
 }
