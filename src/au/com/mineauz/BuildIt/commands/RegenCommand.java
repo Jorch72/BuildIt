@@ -2,17 +2,23 @@ package au.com.mineauz.BuildIt.commands;
 
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import au.com.mineauz.BuildIt.WandManager;
+import au.com.mineauz.BuildIt.BuildIt;
+import au.com.mineauz.BuildIt.selection.Selection;
+import au.com.mineauz.BuildIt.tasks.RegenerateTask;
 
-public class WandCommand implements ICommandDescription
+public class RegenCommand implements ICommandDescription
 {
 	@Override
 	public boolean onCommand( CommandSender sender, Command command, String label, String[] args )
 	{
+		if(args.length != 0)
+			return false;
+		
 		if(!(sender instanceof Player))
 		{
 			sender.sendMessage("Can only be called by a player");
@@ -20,22 +26,19 @@ public class WandCommand implements ICommandDescription
 		}
 		
 		Player player = (Player)sender;
-
-		// Remove existing wand
-		boolean had = false;
-		for(int i = 0; i < player.getInventory().getSize(); ++i)
+		
+		Selection sel = BuildIt.instance.getSelectionManager().getSelection(player);
+		if(sel == null)
 		{
-			if(WandManager.isWand(player.getInventory().getItem(i)))
-			{
-				player.getInventory().clear(i);
-				had = true;
-			}
+			sender.sendMessage(ChatColor.RED + "You have nothing selected");
+			return true;
 		}
 		
-		if(!had)
-			// Give them a wand
-			player.getInventory().addItem(WandManager.makeWand());
-
+		RegenerateTask task = new RegenerateTask(sel);
+		if(!BuildIt.instance.getUndoManager().addStep(sel, player))
+			sender.sendMessage(ChatColor.GOLD + "WARNING: The selection is too large to be undone");
+		BuildIt.instance.getTaskRunner().submit(task);
+		
 		return true;
 	}
 
@@ -48,13 +51,13 @@ public class WandCommand implements ICommandDescription
 	@Override
 	public String getDescription()
 	{
-		return "Gives you the wand, or takes it from you";
+		return "Regenerates the contents of the selection";
 	}
 
 	@Override
 	public String getPermission()
 	{
-		return "buildit.wand";
+		return "buildit.regen";
 	}
 
 	@Override

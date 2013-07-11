@@ -5,71 +5,36 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.WeakHashMap;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.BlockVector;
 
-import au.com.mineauz.BuildIt.BuildIt;
 import au.com.mineauz.BuildIt.MessageHandler;
+import au.com.mineauz.BuildIt.WandManager;
+import au.com.mineauz.BuildIt.WandType;
 import au.com.mineauz.BuildIt.selection.mode.Cutaway;
 import au.com.mineauz.BuildIt.selection.mode.Difference;
 import au.com.mineauz.BuildIt.selection.mode.Intersection;
 import au.com.mineauz.BuildIt.selection.mode.Union;
 
-public class SelectionManager implements Listener
+public class SelectionManager
 {
 	private WeakHashMap<Player, Selection> mSelections;
 	private WeakHashMap<Player, Selection> mLastSelections;
 	
-	public static ItemStack wandItem = new ItemStack(Material.STICK);
-	
-	
-	public SelectionManager(BuildIt instance)
+	public static String getWandExtraTitle(WandMode wandMode, SelectMode selectMode)
 	{
-		Bukkit.getPluginManager().registerEvents(this, instance);
-		mSelections = new WeakHashMap<Player, Selection>();
-		mLastSelections = new WeakHashMap<Player, Selection>();
-	}
-
-	/**
-	 * Gets the current selection for that player. It returns only complete selections only
-	 * @return The current selection, or null if there isnt a complete one
-	 */
-	public Selection getSelection(Player player)
-	{
-		Selection sel = mSelections.get(player);
-		
-		if(sel == null || !sel.isComplete())
-			return null;
-		
-		return sel;
-	}
-	
-
-	public static boolean isWand(ItemStack item)
-	{
-		if(item == null || item.getType() != wandItem.getType() || item.getDurability() != wandItem.getDurability())
-			return false;
-		
-		if(!item.hasItemMeta())
-			return false;
-		
-		ItemMeta meta = item.getItemMeta();
-		return meta.getDisplayName().startsWith(ChatColor.GOLD + "BuildIt Wand");
+		return ChatColor.WHITE + wandMode.toString() + ", " + selectMode.toString();
 	}
 	
 	public static WandMode getWandMode(ItemStack wand)
 	{
-		assert(isWand(wand));
+		assert(WandManager.isWand(wand) && WandManager.getWandType(wand) == WandType.Selection);
 		
 		ItemMeta meta = wand.getItemMeta();
 		List<String> lore = meta.getLore();
@@ -96,28 +61,9 @@ public class SelectionManager implements Listener
 		return WandMode.Normal;
 	}
 	
-	public static ItemStack makeWand()
-	{
-		ItemStack item = new ItemStack(Material.STICK);
-		ItemMeta meta = item.getItemMeta();
-		
-		meta.setDisplayName(makeWandTitle(item, WandMode.Normal, SelectMode.Cuboid));
-		item.setItemMeta(meta);
-		
-		setWandMode(item, WandMode.Normal);
-		setWandSelectionType(item, SelectMode.Cuboid);
-		
-		return item;
-	}
-	
-	private static String makeWandTitle(ItemStack wand, WandMode wandMode, SelectMode selectMode)
-	{
-		return ChatColor.GOLD + "BuildIt Wand " + ChatColor.WHITE + wandMode.toString() + ", " + selectMode.toString();
-	}
-	
 	public static void setWandMode(ItemStack wand, WandMode mode)
 	{
-		assert(isWand(wand));
+		assert(WandManager.isWand(wand) && WandManager.getWandType(wand) == WandType.Selection);
 		
 		ItemMeta meta = wand.getItemMeta();
 		
@@ -145,7 +91,7 @@ public class SelectionManager implements Listener
 		
 		meta.setLore(lore);
 		
-		meta.setDisplayName(makeWandTitle(wand, mode, getWandSelectionMode(wand)));
+		meta.setDisplayName(WandManager.getWandTitle(WandType.Selection) + getWandExtraTitle(mode, getWandSelectionMode(wand)));
 		
 		wand.setItemMeta(meta);
 		
@@ -153,7 +99,7 @@ public class SelectionManager implements Listener
 	
 	public static SelectMode getWandSelectionMode(ItemStack wand)
 	{
-		assert(isWand(wand));
+		assert(WandManager.isWand(wand) && WandManager.getWandType(wand) == WandType.Selection);
 		
 		ItemMeta meta = wand.getItemMeta();
 		List<String> lore = meta.getLore();
@@ -182,7 +128,7 @@ public class SelectionManager implements Listener
 	
 	public static void setWandSelectionType(ItemStack wand, SelectMode mode)
 	{
-		assert(isWand(wand));
+		assert(WandManager.isWand(wand) && WandManager.getWandType(wand) == WandType.Selection);
 		
 		ItemMeta meta = wand.getItemMeta();
 		
@@ -209,15 +155,40 @@ public class SelectionManager implements Listener
 			lore.add(ChatColor.WHITE + "Selection: " + ChatColor.AQUA + mode.toString());
 		
 		meta.setLore(lore);
-		meta.setDisplayName(makeWandTitle(wand, getWandMode(wand), mode));
+		meta.setDisplayName(WandManager.getWandTitle(WandType.Selection) + getWandExtraTitle(getWandMode(wand), mode));
 		
 		wand.setItemMeta(meta);
 	}
 	
-	@EventHandler
-	private void onInteract(PlayerInteractEvent event)
+	public SelectionManager()
 	{
-		if(!event.hasItem() || !isWand(event.getItem()))
+		mSelections = new WeakHashMap<Player, Selection>();
+		mLastSelections = new WeakHashMap<Player, Selection>();
+	}
+
+	/**
+	 * Gets the current selection for that player. It returns only complete selections only
+	 * @return The current selection, or null if there isnt a complete one
+	 */
+	public Selection getSelection(Player player)
+	{
+		Selection sel = mSelections.get(player);
+		
+		if(sel == null || !sel.isComplete())
+			return null;
+		
+		return sel;
+	}
+	
+	public void setSelection( Player player, Selection sel )
+	{
+		mSelections.put(player, sel);
+	}
+	
+
+	public void onWandUse(PlayerInteractEvent event)
+	{
+		if(!event.hasItem() || !WandManager.isWand(event.getItem()) || WandManager.getWandType(event.getItem()) != WandType.Selection)
 			return;
 		
 		if(!event.hasBlock())

@@ -16,6 +16,10 @@ commands:
   /copy:
   /cut: 
   /paste:
+  /sphere:
+  /regen:
+  /expand:
+  /chunk:
 
 permissions:
    buildit.wand:
@@ -33,4 +37,12 @@ permissions:
    buildit.replace:
      default: op
    buildit.naturalize:
+     default: op
+   buildit.gen.sphere:
+     default: op
+   buildit.regen:
+     default: op
+   buildit.expand:
+     default: op
+   buildit.chunk:
      default: op

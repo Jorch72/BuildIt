@@ -27,6 +27,15 @@ public class SphereSelection implements Selection
 		
 		mNext = 0;
 	}
+	
+	public SphereSelection(World world, BlockVector center, double radius)
+	{
+		mWorld = world;
+		mCenter = center;
+		mRadius = radius;
+		
+		mNext = 2;
+	}
 
 	@Override
 	public BlockVector getMinPoint()

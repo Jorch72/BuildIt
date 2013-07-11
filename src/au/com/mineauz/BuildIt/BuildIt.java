@@ -7,17 +7,22 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import au.com.mineauz.BuildIt.commands.ChunkCommand;
 import au.com.mineauz.BuildIt.commands.CopyCommand;
 import au.com.mineauz.BuildIt.commands.CutCommand;
+import au.com.mineauz.BuildIt.commands.ExpandCommand;
 import au.com.mineauz.BuildIt.commands.ICommandDescription;
 import au.com.mineauz.BuildIt.commands.NaturalizeCommand;
 import au.com.mineauz.BuildIt.commands.OffsetCommand;
 import au.com.mineauz.BuildIt.commands.PasteCommand;
 import au.com.mineauz.BuildIt.commands.RedoCommand;
+import au.com.mineauz.BuildIt.commands.RegenCommand;
 import au.com.mineauz.BuildIt.commands.ReplaceCommand;
 import au.com.mineauz.BuildIt.commands.SetCommand;
 import au.com.mineauz.BuildIt.commands.UndoCommand;
 import au.com.mineauz.BuildIt.commands.WandCommand;
+import au.com.mineauz.BuildIt.commands.generation.SphereCommand;
+import au.com.mineauz.BuildIt.drawing.DrawingManager;
 import au.com.mineauz.BuildIt.selection.SelectionManager;
 import au.com.mineauz.BuildIt.tasks.IncrementalTaskRunner;
 
@@ -26,6 +31,10 @@ public class BuildIt extends JavaPlugin
 	public static BuildIt instance;
 	
 	private SelectionManager mSelections;
+	private DrawingManager mDrawings;
+	@SuppressWarnings( "unused" )
+	private WandManager mWandManager;
+	
 	private IncrementalTaskRunner mTaskRunner;
 	private UndoManager mUndoManager;
 	private ClipboardManager mClipboardManager;
@@ -38,7 +47,9 @@ public class BuildIt extends JavaPlugin
 	@Override
 	public void onEnable()
 	{
-		mSelections = new SelectionManager(this);
+		mSelections = new SelectionManager();
+		mDrawings = new DrawingManager();
+		mWandManager = new WandManager(this);
 		mTaskRunner = new IncrementalTaskRunner();
 		mUndoManager = new UndoManager();
 		mClipboardManager = new ClipboardManager();
@@ -53,6 +64,12 @@ public class BuildIt extends JavaPlugin
 		registerCommand("/cut", new CutCommand());
 		registerCommand("/copy", new CopyCommand());
 		registerCommand("/paste", new PasteCommand());
+		registerCommand("/regen", new RegenCommand());
+		registerCommand("/expand", new ExpandCommand());
+		registerCommand("/chunk", new ChunkCommand());
+		
+		registerCommand("/sphere", new SphereCommand());
+		
 	}
 	
 	@Override
@@ -80,6 +97,7 @@ public class BuildIt extends JavaPlugin
 	}
 	
 	public SelectionManager getSelectionManager() { return mSelections; }
+	public DrawingManager getDrawingManager() { return mDrawings; }
 	public IncrementalTaskRunner getTaskRunner() { return mTaskRunner; }
 	public UndoManager getUndoManager() { return mUndoManager; }
 	public ClipboardManager getClipboardManager() { return mClipboardManager; }

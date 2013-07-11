@@ -29,6 +29,15 @@ public class CuboidSelection implements Selection
 		mNext = 0;
 	}
 	
+	public CuboidSelection(World world, BlockVector min, BlockVector max)
+	{
+		mWorld = world;
+		mMin = min;
+		mMax = max;
+		
+		mNext = 2;
+	}
+	
 	@Override
 	public BlockVector getMinPoint()
 	{
