@@ -1,6 +1,8 @@
 package au.com.mineauz.BuildIt.selection.mode;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.World;
@@ -128,5 +130,22 @@ public class SphereSelection implements Selection
 	public void expand( BlockFace dir, int amount )
 	{
 		mRadius += amount;
+	}
+	
+	@Override
+	public List<BlockVector> getPointsForDisplay()
+	{
+		ArrayList<BlockVector> points = new ArrayList<BlockVector>();
+		
+		points.add(new BlockVector(mCenter.getBlockX(), mCenter.getBlockY() + mRadius, mCenter.getBlockZ()));
+		points.add(new BlockVector(mCenter.getBlockX(), mCenter.getBlockY() - mRadius, mCenter.getBlockZ()));
+		
+		points.add(new BlockVector(mCenter.getBlockX() + mRadius, mCenter.getBlockY(), mCenter.getBlockZ()));
+		points.add(new BlockVector(mCenter.getBlockX() - mRadius, mCenter.getBlockY(), mCenter.getBlockZ()));
+		
+		points.add(new BlockVector(mCenter.getBlockX(), mCenter.getBlockY(), mCenter.getBlockZ() + mRadius));
+		points.add(new BlockVector(mCenter.getBlockX(), mCenter.getBlockY(), mCenter.getBlockZ() - mRadius));
+		
+		return points;
 	}
 }

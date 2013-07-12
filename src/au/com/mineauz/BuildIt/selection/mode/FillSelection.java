@@ -1,6 +1,7 @@
 package au.com.mineauz.BuildIt.selection.mode;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
@@ -93,5 +94,12 @@ public class FillSelection implements Selection
 	{
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public List<BlockVector> getPointsForDisplay()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

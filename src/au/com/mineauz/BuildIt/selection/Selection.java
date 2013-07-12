@@ -1,6 +1,7 @@
 package au.com.mineauz.BuildIt.selection;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
@@ -36,4 +37,6 @@ public interface Selection extends Iterable<BlockVector>, Cloneable
 	public void scale(BlockVector amount);
 	
 	public void expand(BlockFace dir, int amount);
+	
+	public List<BlockVector> getPointsForDisplay();
 }

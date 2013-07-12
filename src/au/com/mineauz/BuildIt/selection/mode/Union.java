@@ -1,6 +1,8 @@
 package au.com.mineauz.BuildIt.selection.mode;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.World;
@@ -115,5 +117,19 @@ public class Union implements Selection
 	{
 		mA.expand(dir, amount);
 		mB.expand(dir, amount);
+	}
+	
+	@Override
+	public List<BlockVector> getPointsForDisplay()
+	{
+		List<BlockVector> a = mA.getPointsForDisplay();
+		List<BlockVector> b = mB.getPointsForDisplay();
+		
+		ArrayList<BlockVector> points = new ArrayList<BlockVector>();
+		
+		points.addAll(a);
+		points.addAll(b);
+		
+		return points;
 	}
 }

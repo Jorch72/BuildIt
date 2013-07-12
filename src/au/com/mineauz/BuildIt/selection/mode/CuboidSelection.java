@@ -1,6 +1,8 @@
 package au.com.mineauz.BuildIt.selection.mode;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.World;
@@ -156,5 +158,53 @@ public class CuboidSelection implements Selection
 		default:
 			break;
 		}
+	}
+	
+	@Override
+	public List<BlockVector> getPointsForDisplay()
+	{
+		ArrayList<BlockVector> points = new ArrayList<BlockVector>();
+		
+		int pX = (mMax.getBlockX() - mMin.getBlockX()) / 10;
+		int pY = (mMax.getBlockY() - mMin.getBlockY()) / 10;
+		int pZ = (mMax.getBlockZ() - mMin.getBlockZ()) / 10;
+		
+		points.add(new BlockVector(mMin.getBlockX(), mMin.getBlockY(), mMin.getBlockZ()));
+		points.add(new BlockVector(mMin.getBlockX(), mMin.getBlockY(), mMax.getBlockZ()));
+		points.add(new BlockVector(mMin.getBlockX(), mMax.getBlockY(), mMin.getBlockZ()));
+		points.add(new BlockVector(mMax.getBlockX(), mMin.getBlockY(), mMin.getBlockZ()));
+		points.add(new BlockVector(mMin.getBlockX(), mMax.getBlockY(), mMax.getBlockZ()));
+		points.add(new BlockVector(mMax.getBlockX(), mMax.getBlockY(), mMin.getBlockZ()));
+		points.add(new BlockVector(mMax.getBlockX(), mMin.getBlockY(), mMax.getBlockZ()));
+		points.add(new BlockVector(mMax.getBlockX(), mMax.getBlockY(), mMax.getBlockZ()));
+		
+		double amt = (mMax.getBlockX() - mMin.getBlockX()) / (pX + 1);
+		for(int i = 0; i <= pX; ++i)
+		{
+			points.add(new BlockVector(mMin.getBlockX() + i * amt, mMin.getBlockY(), mMin.getBlockZ()));
+			points.add(new BlockVector(mMin.getBlockX() + i * amt, mMax.getBlockY(), mMin.getBlockZ()));
+			points.add(new BlockVector(mMin.getBlockX() + i * amt, mMin.getBlockY(), mMax.getBlockZ()));
+			points.add(new BlockVector(mMin.getBlockX() + i * amt, mMax.getBlockY(), mMax.getBlockZ()));
+		}
+		
+		amt = (mMax.getBlockZ() - mMin.getBlockZ()) / (pZ + 1);
+		for(int i = 0; i <= pZ; ++i)
+		{
+			points.add(new BlockVector(mMin.getBlockX(), mMin.getBlockY(), mMin.getBlockZ() + i * amt));
+			points.add(new BlockVector(mMin.getBlockX(), mMax.getBlockY(), mMin.getBlockZ() + i * amt));
+			points.add(new BlockVector(mMax.getBlockX(), mMin.getBlockY(), mMin.getBlockZ() + i * amt));
+			points.add(new BlockVector(mMax.getBlockX(), mMax.getBlockY(), mMin.getBlockZ() + i * amt));
+		}
+		
+		amt = (mMax.getBlockY() - mMin.getBlockY()) / (pY + 1);
+		for(int i = 0; i <= pY; ++i)
+		{
+			points.add(new BlockVector(mMin.getBlockX(), mMin.getBlockY() + i * amt, mMin.getBlockZ()));
+			points.add(new BlockVector(mMax.getBlockX(), mMin.getBlockY() + i * amt, mMin.getBlockZ()));
+			points.add(new BlockVector(mMin.getBlockX(), mMin.getBlockY() + i * amt, mMax.getBlockZ()));
+			points.add(new BlockVector(mMax.getBlockX(), mMin.getBlockY() + i * amt, mMax.getBlockZ()));
+		}
+		
+		return points;
 	}
 }

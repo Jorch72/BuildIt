@@ -5,15 +5,25 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.WeakHashMap;
 
+import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.BlockVector;
 
+import au.com.mineauz.BuildIt.BuildIt;
 import au.com.mineauz.BuildIt.MessageHandler;
 import au.com.mineauz.BuildIt.WandManager;
 import au.com.mineauz.BuildIt.WandType;
@@ -22,10 +32,13 @@ import au.com.mineauz.BuildIt.selection.mode.Difference;
 import au.com.mineauz.BuildIt.selection.mode.Intersection;
 import au.com.mineauz.BuildIt.selection.mode.Union;
 
-public class SelectionManager
+public class SelectionManager implements Listener
 {
 	private WeakHashMap<Player, Selection> mSelections;
 	private WeakHashMap<Player, Selection> mLastSelections;
+	
+	private WeakHashMap<Player, List<BlockVector>> mDisplaying;
+	
 	
 	public static String getWandExtraTitle(WandMode wandMode, SelectMode selectMode)
 	{
@@ -164,6 +177,8 @@ public class SelectionManager
 	{
 		mSelections = new WeakHashMap<Player, Selection>();
 		mLastSelections = new WeakHashMap<Player, Selection>();
+		mDisplaying = new WeakHashMap<Player, List<BlockVector>>();
+		Bukkit.getPluginManager().registerEvents(this, BuildIt.instance);
 	}
 
 	/**
@@ -182,7 +197,9 @@ public class SelectionManager
 	
 	public void setSelection( Player player, Selection sel )
 	{
+		Validate.isTrue(sel.isComplete());
 		mSelections.put(player, sel);
+		displaySelection(player, sel);
 	}
 	
 
@@ -246,7 +263,10 @@ public class SelectionManager
 				
 				Selection sel = mSelections.get(event.getPlayer());
 				if(sel != null && !sel.isComplete())
+				{
 					mSelections.remove(event.getPlayer());
+					hideSelection(event.getPlayer());
+				}
 			}
 		}
 		else
@@ -268,6 +288,7 @@ public class SelectionManager
 				Selection sel = mode.newSelection(event.getPlayer().getWorld());
 				if(sel.addPoint(event.getClickedBlock().getLocation().toVector().toBlockVector(), messages))
 				{
+					hideSelection(event.getPlayer());
 					if(old != null && old.isComplete())
 					{
 						switch(wandMode)
@@ -309,6 +330,7 @@ public class SelectionManager
 						int vol = dx * dy * dz;
 						
 						messages.addMessage(ChatColor.GREEN + "Selection Bounds { %d, %d, %d Volume: %d }", dx, dy, dz, vol);
+						displaySelection(event.getPlayer(), sel);
 					}
 				}
 				
@@ -320,6 +342,7 @@ public class SelectionManager
 				
 				if(sel != null && sel.getWorld().equals(event.getPlayer().getWorld()))
 				{
+					hideSelection(event.getPlayer());
 					sel.addPoint(event.getClickedBlock().getLocation().toVector().toBlockVector(), messages);
 					
 					if(sel.isComplete())
@@ -331,6 +354,7 @@ public class SelectionManager
 						int vol = dx * dy * dz;
 						
 						messages.addMessage(ChatColor.GREEN + "Selection Bounds { %d, %d, %d Volume: %d }", dx, dy, dz, vol);
+						displaySelection(event.getPlayer(), sel);
 					}
 				}
 			}
@@ -341,6 +365,57 @@ public class SelectionManager
 		event.setCancelled(true);
 		event.setUseInteractedBlock(Result.DENY);
 		event.setUseItemInHand(Result.DENY);
+	}
+
+	private void displaySelection(Player player, Selection sel)
+	{
+		Validate.isTrue(sel.isComplete());
+		
+		if(mDisplaying.containsKey(player))
+			hideSelection(player);
+		
+		if(!sel.getWorld().equals(player.getWorld()))
+			return;
+		
+		List<BlockVector> blocks = sel.getPointsForDisplay();
+		
+		World world = player.getWorld();
+		
+		for(BlockVector block : blocks)
+			player.sendBlockChange(block.toLocation(world), Material.GOLD_BLOCK, (byte)0);
+		
+		mDisplaying.put(player, blocks);
+	}
+	
+	private void hideSelection(Player player)
+	{
+		List<BlockVector> blocks = mDisplaying.get(player);
+		
+		if(blocks == null)
+			return;
+		
+		World world = player.getWorld();
+		
+		for(BlockVector block : blocks)
+		{
+			Block b = world.getBlockAt(block.getBlockX(), block.getBlockY(), block.getBlockZ());
+			player.sendBlockChange(block.toLocation(world), b.getType(), b.getData());
+		}
+		
+		mDisplaying.remove(player);
+	}
+	
+	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=true)
+	private void onPlayerChangeWorld(PlayerChangedWorldEvent event)
+	{
+		Selection sel = getSelection(event.getPlayer()); 
+		if(sel != null)
+		{
+			if(event.getPlayer().getWorld().equals(sel.getWorld()))
+				displaySelection(event.getPlayer(), sel);
+			else
+				mDisplaying.remove(event.getPlayer());
+		}
 	}
 	
 	public static Iterator<BlockVector> makeIterator(Selection selection)
