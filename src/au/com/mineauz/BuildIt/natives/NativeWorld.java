@@ -1,11 +1,8 @@
 package au.com.mineauz.BuildIt.natives;
 
-import org.bukkit.World;
-
-public abstract class NativeWorld
+public interface NativeWorld
 {
-	public static NativeWorld getWorld(World world)
-	{
-		return null;
-	}
+	public void populateChunk(int x, int z);
+	
+	public NativeChunk generateChunk(int x, int z);
 }

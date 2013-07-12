@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import au.com.mineauz.BuildIt.commands.ChunkCommand;
@@ -23,6 +24,7 @@ import au.com.mineauz.BuildIt.commands.UndoCommand;
 import au.com.mineauz.BuildIt.commands.WandCommand;
 import au.com.mineauz.BuildIt.commands.generation.SphereCommand;
 import au.com.mineauz.BuildIt.drawing.DrawingManager;
+import au.com.mineauz.BuildIt.natives.NativeManager;
 import au.com.mineauz.BuildIt.selection.SelectionManager;
 import au.com.mineauz.BuildIt.tasks.IncrementalTaskRunner;
 
@@ -47,6 +49,17 @@ public class BuildIt extends JavaPlugin
 	@Override
 	public void onEnable()
 	{
+		try
+		{
+			NativeManager.initialize();
+		}
+		catch(InvalidPluginException e)
+		{
+			getLogger().severe("This version of BuiltIt (" + getDescription().getVersion() + ") is not compatable with Craftbukkit " + NativeManager.getCraftBukkitVersion());
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
+		
 		mSelections = new SelectionManager();
 		mDrawings = new DrawingManager();
 		mWandManager = new WandManager(this);

@@ -2,19 +2,19 @@ package au.com.mineauz.BuildIt.tasks;
 
 import java.util.Random;
 
-import net.minecraft.server.v1_6_R2.BiomeBase;
-
 import org.apache.commons.lang.Validate;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_6_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_6_R2.block.CraftBlock;
+import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.generator.ChunkGenerator.BiomeGrid;
 import org.bukkit.util.BlockVector;
 
+import au.com.mineauz.BuildIt.natives.NativeChunk;
+import au.com.mineauz.BuildIt.natives.NativeManager;
+import au.com.mineauz.BuildIt.natives.NativeWorld;
 import au.com.mineauz.BuildIt.selection.Selection;
 
 public class RegenerateTask implements IncrementalTask
@@ -34,7 +34,7 @@ public class RegenerateTask implements IncrementalTask
 	private BiomeLookup mLookup;
 	private Random mRand;
 	
-	private net.minecraft.server.v1_6_R2.Chunk mNativeChunk;
+	private NativeChunk mNativeChunk;
 	
 	public RegenerateTask(Selection selection)
 	{
@@ -118,6 +118,24 @@ public class RegenerateTask implements IncrementalTask
 	{
 		if(!offsetToNext())
 		{
+			if(!mIsDone)
+			{
+				if(mChunk != null)
+				{
+					// Do block population for the last chunk
+					// TODO: We will need to store the state of the blocks that we are not regenning within the chunk so we can undo the block populator in those parts
+					if(mNativeChunk != null)
+					{
+						NativeWorld world = NativeManager.getNativeWorld(mWorld);
+						world.populateChunk(mChunk.getX(), mChunk.getZ());
+					}
+					else
+					{
+						for(BlockPopulator populator : mWorld.getPopulators())
+							populator.populate(mWorld, new Random(), mChunk);
+					}
+				}
+			}
 			mIsDone = true;
 			return 0f;
 		}
@@ -130,6 +148,21 @@ public class RegenerateTask implements IncrementalTask
 		
 		if(mChunk == null || (mProgress.getBlockX() >> 4) != mChunk.getX() || (mProgress.getBlockZ() >> 4) != mChunk.getZ())
 		{
+			if(mChunk != null)
+			{
+				// Do block population for the last chunk
+				// TODO: We will need to store the state of the blocks that we are not regenning within the chunk so we can undo the block populator in those parts
+				if(mNativeChunk != null)
+				{
+					NativeWorld world = NativeManager.getNativeWorld(mWorld);
+					world.populateChunk(mChunk.getX(), mChunk.getZ());
+				}
+				else
+				{
+					for(BlockPopulator populator : mWorld.getPopulators())
+						populator.populate(mWorld, new Random(), mChunk);
+				}
+			}
 			// Load the next chunk
 			mChunk = mWorld.getChunkAt(mProgress.getBlockX() >> 4, mProgress.getBlockZ() >> 4);
 			
@@ -141,9 +174,8 @@ public class RegenerateTask implements IncrementalTask
 				mNativeChunk = null;
 			}
 			else
-			{
-				mNativeChunk = ((CraftWorld)mWorld).getHandle().chunkProviderServer.chunkProvider.getOrCreateChunk(mProgress.getBlockX() >> 4, mProgress.getBlockZ() >> 4);
-			}
+				mNativeChunk = NativeManager.getNativeWorld(mWorld).generateChunk(mProgress.getBlockX() >> 4, mProgress.getBlockZ() >> 4);
+
 			System.out.println("Generating chunk " + mChunk.getX() + ", " + mChunk.getZ());
 		}
 
@@ -157,10 +189,7 @@ public class RegenerateTask implements IncrementalTask
 		block.setTypeId(id, false);
 		
 		if(mNativeChunk != null)
-		{
-			BiomeBase baseBiome = mNativeChunk.a(mProgress.getBlockX() & 0xF, mProgress.getBlockZ() & 0xF, ((CraftWorld)mWorld).getHandle().worldProvider.e);
-			block.setBiome(CraftBlock.biomeBaseToBiome(baseBiome));
-		}
+			block.setBiome(mNativeChunk.getBiome(mProgress.getBlockX() & 0xF, mProgress.getBlockZ() & 0xF));
 		
 		return 4;
 	}
