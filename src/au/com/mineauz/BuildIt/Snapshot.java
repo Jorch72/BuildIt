@@ -35,12 +35,29 @@ public class Snapshot
 		return snapshot;
 	}
 	
+	public static Snapshot createImmediate(Selection selection)
+	{
+		Snapshot snapshot = new Snapshot(selection);
+		SnapshotBuilder builder = snapshot.new SnapshotBuilder();
+		while(!builder.isDone())
+			builder.doSome();
+		
+		return snapshot;
+	}
+	
 	/**
 	 * Replaces all of the snapshot back into the world
 	 */
 	public void restore()
 	{
 		BuildIt.instance.getTaskRunner().submit(new SnapshotRestorer(true));
+	}
+	
+	public void restoreImmediate()
+	{
+		SnapshotRestorer restorer = new SnapshotRestorer(true);
+		while (!restorer.isDone())
+			restorer.doSome();
 	}
 	
 	public void restore(BlockVector offset, World world, boolean includeAir)

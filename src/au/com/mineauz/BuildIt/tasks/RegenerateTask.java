@@ -12,10 +12,14 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.generator.ChunkGenerator.BiomeGrid;
 import org.bukkit.util.BlockVector;
 
+import au.com.mineauz.BuildIt.Snapshot;
 import au.com.mineauz.BuildIt.natives.NativeChunk;
 import au.com.mineauz.BuildIt.natives.NativeManager;
 import au.com.mineauz.BuildIt.natives.NativeWorld;
 import au.com.mineauz.BuildIt.selection.Selection;
+import au.com.mineauz.BuildIt.selection.mode.CuboidSelection;
+import au.com.mineauz.BuildIt.selection.mode.Cutaway;
+import au.com.mineauz.BuildIt.selection.mode.Intersection;
 
 public class RegenerateTask implements IncrementalTask
 {
@@ -123,7 +127,12 @@ public class RegenerateTask implements IncrementalTask
 				if(mChunk != null)
 				{
 					// Do block population for the last chunk
-					// TODO: We will need to store the state of the blocks that we are not regenning within the chunk so we can undo the block populator in those parts
+					Selection chunk = new CuboidSelection(mWorld, new BlockVector(mChunk.getX() * 16, 0, mChunk.getZ() * 16), new BlockVector((mChunk.getX() + 1) * 16, mWorld.getMaxHeight() - 1, (mChunk.getZ() + 1) * 16));
+					Selection inChunk = new Intersection(chunk, mSelection);
+					Selection total = new CuboidSelection(mWorld, new BlockVector(mChunk.getX() * 16 - 8, 0, mChunk.getZ() * 16 - 8), new BlockVector((mChunk.getX() + 1) * 16 + 8, mWorld.getMaxHeight() - 1, (mChunk.getZ() + 1) * 16 + 8));
+					total = new Cutaway(total, inChunk);
+					
+					Snapshot snap = Snapshot.createImmediate(total);
 					if(mNativeChunk != null)
 					{
 						NativeWorld world = NativeManager.getNativeWorld(mWorld);
@@ -134,6 +143,8 @@ public class RegenerateTask implements IncrementalTask
 						for(BlockPopulator populator : mWorld.getPopulators())
 							populator.populate(mWorld, new Random(), mChunk);
 					}
+					
+					snap.restoreImmediate();
 				}
 			}
 			mIsDone = true;
@@ -151,7 +162,12 @@ public class RegenerateTask implements IncrementalTask
 			if(mChunk != null)
 			{
 				// Do block population for the last chunk
-				// TODO: We will need to store the state of the blocks that we are not regenning within the chunk so we can undo the block populator in those parts
+				Selection chunk = new CuboidSelection(mWorld, new BlockVector(mChunk.getX() * 16, 0, mChunk.getZ() * 16), new BlockVector((mChunk.getX() + 1) * 16, mWorld.getMaxHeight() - 1, (mChunk.getZ() + 1) * 16));
+				Selection inChunk = new Intersection(chunk, mSelection);
+				Selection total = new CuboidSelection(mWorld, new BlockVector(mChunk.getX() * 16 - 8, 0, mChunk.getZ() * 16 - 8), new BlockVector((mChunk.getX() + 1) * 16 + 8, mWorld.getMaxHeight() - 1, (mChunk.getZ() + 1) * 16 + 8));
+				total = new Cutaway(total, inChunk);
+				
+				Snapshot snap = Snapshot.createImmediate(total);
 				if(mNativeChunk != null)
 				{
 					NativeWorld world = NativeManager.getNativeWorld(mWorld);
@@ -162,6 +178,7 @@ public class RegenerateTask implements IncrementalTask
 					for(BlockPopulator populator : mWorld.getPopulators())
 						populator.populate(mWorld, new Random(), mChunk);
 				}
+				snap.restoreImmediate();
 			}
 			// Load the next chunk
 			mChunk = mWorld.getChunkAt(mProgress.getBlockX() >> 4, mProgress.getBlockZ() >> 4);
