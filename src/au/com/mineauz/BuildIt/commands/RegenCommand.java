@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import au.com.mineauz.BuildIt.BuildIt;
+import au.com.mineauz.BuildIt.MessageCallback;
 import au.com.mineauz.BuildIt.selection.Selection;
 import au.com.mineauz.BuildIt.tasks.RegenerateTask;
 
@@ -37,7 +38,7 @@ public class RegenCommand implements ICommandDescription
 		RegenerateTask task = new RegenerateTask(sel);
 		if(!BuildIt.instance.getUndoManager().addStep(sel, player))
 			sender.sendMessage(ChatColor.GOLD + "WARNING: The selection is too large to be undone");
-		BuildIt.instance.getTaskRunner().submit(task);
+		BuildIt.instance.getTaskRunner().submit(task, new MessageCallback(player, "Selection regenerated"));
 		
 		return true;
 	}

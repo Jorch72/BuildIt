@@ -25,10 +25,7 @@ public class UndoCommand implements ICommandDescription
 		Player player = (Player)sender;
 		
 		if(BuildIt.instance.getUndoManager().canUndo(player))
-		{
 			BuildIt.instance.getUndoManager().undoStep(player);
-			sender.sendMessage("Undo successful");
-		}
 		else
 			sender.sendMessage("Nothing more to undo");
 		

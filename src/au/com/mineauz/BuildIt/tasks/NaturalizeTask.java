@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.util.BlockVector;
 
@@ -103,5 +104,11 @@ public class NaturalizeTask implements IncrementalTask
 	public boolean isDone()
 	{
 		return !mProgress.hasNext();
+	}
+	
+	@Override
+	public World getWorld()
+	{
+		return mSelection.getWorld();
 	}
 }

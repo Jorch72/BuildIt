@@ -1,6 +1,7 @@
 package au.com.mineauz.BuildIt.tasks;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.World;
 
 import au.com.mineauz.BuildIt.Mask;
 import au.com.mineauz.BuildIt.generation.IGenerator;
@@ -51,5 +52,11 @@ public class GeneratorTask implements IncrementalTask
 	public boolean isDone()
 	{
 		return mGenerator.isDone();
+	}
+	
+	@Override
+	public World getWorld()
+	{
+		return null;
 	}
 }

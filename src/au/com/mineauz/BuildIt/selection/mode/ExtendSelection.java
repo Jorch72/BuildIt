@@ -136,16 +136,16 @@ public class ExtendSelection implements Selection
 			mMax.setX(mMax.getX() + amount);
 			break;
 		case NORTH:
-			mMax.setZ(mMax.getZ() + amount);
+			mMax.setZ(mMax.getZ() - amount);
 			break;
 		case SOUTH:
-			mMin.setZ(mMin.getZ() - amount);
+			mMin.setZ(mMin.getZ() + amount);
 			break;
 		case UP:
 			mMax.setY(mMax.getY() + amount);
 			break;
 		case WEST:
-			mMin.setX(mMin.getX() + amount);
+			mMin.setX(mMin.getX() - amount);
 			break;
 		default:
 			break;

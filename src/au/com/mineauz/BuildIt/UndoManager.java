@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import au.com.mineauz.BuildIt.selection.Selection;
@@ -95,7 +96,10 @@ public class UndoManager
 		
 		redoSteps.push(Snapshot.create(snapshot.getSelection()));
 		
-		snapshot.restore();
+		if(player.isOnline())
+			snapshot.restore(new MessageCallback((Player)player, "Undo complete"));
+		else
+			snapshot.restore(null);
 	}
 	
 	public void redoStep(OfflinePlayer player)
@@ -113,7 +117,10 @@ public class UndoManager
 		
 		steps.push(Snapshot.create(snapshot.getSelection()));
 		
-		snapshot.restore();
+		if(player.isOnline())
+			snapshot.restore(new MessageCallback((Player)player, "Redo complete"));
+		else
+			snapshot.restore(null);
 	}
 	
 	public boolean canUndo(OfflinePlayer player)

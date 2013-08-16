@@ -3,6 +3,7 @@ package au.com.mineauz.BuildIt.tasks;
 import java.util.Iterator;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.util.BlockVector;
 
@@ -73,5 +74,11 @@ public class BlockChangeTask implements IncrementalTask
 	public boolean isDone()
 	{
 		return !mProgress.hasNext();
+	}
+	
+	@Override
+	public World getWorld()
+	{
+		return mSelection.getWorld();
 	}
 }

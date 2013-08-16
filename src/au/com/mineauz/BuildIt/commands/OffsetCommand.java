@@ -65,6 +65,9 @@ public class OffsetCommand implements ICommandDescription
 		else if(args[1].equalsIgnoreCase("left"))
 		{
 			double yaw = player.getEyeLocation().getYaw();
+			
+			if(yaw >= 180)
+				yaw -= 360;
 
 			if(yaw >= -45 && yaw <= 45) // south
 				direction = BlockFace.EAST;
@@ -78,6 +81,9 @@ public class OffsetCommand implements ICommandDescription
 		else if(args[1].equalsIgnoreCase("right"))
 		{
 			double yaw = player.getEyeLocation().getYaw();
+			
+			if(yaw >= 180)
+				yaw -= 360;
 
 			if(yaw >= -45 && yaw <= 45) // south
 				direction = BlockFace.WEST;
@@ -91,6 +97,9 @@ public class OffsetCommand implements ICommandDescription
 		else if(args[1].equalsIgnoreCase("forward"))
 		{
 			double yaw = player.getEyeLocation().getYaw();
+			
+			if(yaw >= 180)
+				yaw -= 360;
 
 			if(yaw >= -45 && yaw <= 45) // south
 				direction = BlockFace.SOUTH;
@@ -104,6 +113,9 @@ public class OffsetCommand implements ICommandDescription
 		else if(args[1].equalsIgnoreCase("back"))
 		{
 			double yaw = player.getEyeLocation().getYaw();
+			
+			if(yaw >= 180)
+				yaw -= 360;
 
 			if(yaw >= -45 && yaw <= 45) // south
 				direction = BlockFace.NORTH;
@@ -121,6 +133,7 @@ public class OffsetCommand implements ICommandDescription
 		}
 		
 		sel.offset(new BlockVector(amount * direction.getModX(), amount * direction.getModY(), amount * direction.getModZ()));
+		BuildIt.instance.getSelectionManager().reshowSelection(player);
 		sender.sendMessage("Selection offset " + amount + " units " + direction.toString().toLowerCase().replaceAll("_", " "));
 		
 		return true;

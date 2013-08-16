@@ -64,6 +64,9 @@ public class ExpandCommand implements ICommandDescription
 		else if(args[1].equalsIgnoreCase("left"))
 		{
 			double yaw = player.getEyeLocation().getYaw();
+			
+			if(yaw >= 180)
+				yaw -= 360;
 
 			if(yaw >= -45 && yaw <= 45) // south
 				direction = BlockFace.EAST;
@@ -77,6 +80,9 @@ public class ExpandCommand implements ICommandDescription
 		else if(args[1].equalsIgnoreCase("right"))
 		{
 			double yaw = player.getEyeLocation().getYaw();
+			
+			if(yaw >= 180)
+				yaw -= 360;
 
 			if(yaw >= -45 && yaw <= 45) // south
 				direction = BlockFace.WEST;
@@ -90,6 +96,9 @@ public class ExpandCommand implements ICommandDescription
 		else if(args[1].equalsIgnoreCase("forward"))
 		{
 			double yaw = player.getEyeLocation().getYaw();
+			
+			if(yaw >= 180)
+				yaw -= 360;
 
 			if(yaw >= -45 && yaw <= 45) // south
 				direction = BlockFace.SOUTH;
@@ -103,6 +112,9 @@ public class ExpandCommand implements ICommandDescription
 		else if(args[1].equalsIgnoreCase("back"))
 		{
 			double yaw = player.getEyeLocation().getYaw();
+			
+			if(yaw >= 180)
+				yaw -= 360;
 
 			if(yaw >= -45 && yaw <= 45) // south
 				direction = BlockFace.NORTH;
@@ -121,6 +133,7 @@ public class ExpandCommand implements ICommandDescription
 		
 		sel.expand(direction, amount);
 		sender.sendMessage("Selection expanded " + amount + " units " + direction.toString().toLowerCase().replaceAll("_", " "));
+		BuildIt.instance.getSelectionManager().reshowSelection(player);
 		
 		return true;
 	}

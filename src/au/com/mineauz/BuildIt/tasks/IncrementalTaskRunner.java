@@ -1,6 +1,7 @@
 package au.com.mineauz.BuildIt.tasks;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,18 +13,36 @@ import au.com.mineauz.BuildIt.BuildIt;
 public class IncrementalTaskRunner
 {
 	private List<IncrementalTask> mAllTasks;
+	private List<IncrementalTask> mWaitingTasks;
+	
+	private HashMap<IncrementalTask, Runnable> mCallbacks;
 	private BukkitTask mTask;
+	
+	private boolean mIsProcessing;
 	
 	public static int maxChangesPerTick = 4000;
 	
 	public IncrementalTaskRunner()
 	{
 		mAllTasks = new ArrayList<IncrementalTask>();
+		mWaitingTasks = new ArrayList<IncrementalTask>();
+		
+		mCallbacks = new HashMap<IncrementalTask, Runnable>();
 		mTask = null;
 	}
-	public void submit(IncrementalTask task )
+	public void submit(IncrementalTask task)
 	{
-		mAllTasks.add(task);
+		submit(task, null);
+	}
+	public void submit(IncrementalTask task, Runnable callback )
+	{
+		if(mIsProcessing)
+			mWaitingTasks.add(task);
+		else
+			mAllTasks.add(task);
+		
+		if(callback != null)
+			mCallbacks.put(task, callback);
 		
 		// Start processing tasks
 		if(mTask == null)
@@ -49,6 +68,7 @@ public class IncrementalTaskRunner
 	
 	private void processAll()
 	{
+		mIsProcessing = true;
 		Iterator<IncrementalTask> it = mAllTasks.iterator();
 
 		double changes = 0;
@@ -60,6 +80,15 @@ public class IncrementalTaskRunner
 				if(task.isDone())
 				{
 					it.remove();
+
+					if(task.getWorld() != null)
+						BuildIt.instance.getSelectionManager().reshowSelections(task.getWorld());
+					
+					Runnable callback = mCallbacks.remove(task);
+
+					if(callback != null)
+						callback.run();
+					
 					continue outer;
 				}
 				
@@ -67,10 +96,26 @@ public class IncrementalTaskRunner
 			}
 		}
 		
+		mAllTasks.addAll(mWaitingTasks);
+		mWaitingTasks.clear();
+		
 		if(mAllTasks.isEmpty())
 		{
 			mTask.cancel();
 			mTask = null;
 		}
+		
+		mIsProcessing = false;
+	}
+	
+	public void forceAll()
+	{
+		for(IncrementalTask task : mAllTasks)
+		{
+			while(!task.isDone())
+				task.doSome();
+		}
+		
+		mAllTasks.clear();
 	}
 }

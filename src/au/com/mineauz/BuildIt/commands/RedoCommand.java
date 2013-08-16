@@ -25,10 +25,7 @@ public class RedoCommand implements ICommandDescription
 		Player player = (Player)sender;
 		
 		if(BuildIt.instance.getUndoManager().canRedo(player))
-		{
 			BuildIt.instance.getUndoManager().redoStep(player);
-			sender.sendMessage("Redo successful");
-		}
 		else
 			sender.sendMessage("Nothing more to redo");
 		

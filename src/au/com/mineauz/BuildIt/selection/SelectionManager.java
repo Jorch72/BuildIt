@@ -3,6 +3,7 @@ package au.com.mineauz.BuildIt.selection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
 import org.apache.commons.lang.Validate;
@@ -31,6 +32,7 @@ import au.com.mineauz.BuildIt.selection.mode.Cutaway;
 import au.com.mineauz.BuildIt.selection.mode.Difference;
 import au.com.mineauz.BuildIt.selection.mode.Intersection;
 import au.com.mineauz.BuildIt.selection.mode.Union;
+import au.com.mineauz.BuildIt.tasks.IncrementalTask;
 
 public class SelectionManager implements Listener
 {
@@ -367,6 +369,29 @@ public class SelectionManager implements Listener
 		event.setUseItemInHand(Result.DENY);
 	}
 
+	public void reshowSelections(World world)
+	{
+		for(Entry<Player, Selection> entry : mSelections.entrySet())
+		{
+			if(entry.getValue().isComplete() && entry.getValue().getWorld().equals(world))
+				displaySelection(entry.getKey(), entry.getValue());
+		}
+	}
+	public void reshowSelection(Player player)
+	{
+		Selection sel = getSelection(player);
+		if(sel != null)
+			displaySelection(player, sel);
+	}
+	
+	public void removeAllSelections()
+	{
+		for(Player player : mSelections.keySet())
+			hideSelection(player);
+		
+		mSelections.clear();
+	}
+	
 	private void displaySelection(Player player, Selection sel)
 	{
 		Validate.isTrue(sel.isComplete());
@@ -379,11 +404,8 @@ public class SelectionManager implements Listener
 		
 		List<BlockVector> blocks = sel.getPointsForDisplay();
 		
-		World world = player.getWorld();
-		
-		for(BlockVector block : blocks)
-			player.sendBlockChange(block.toLocation(world), Material.GOLD_BLOCK, (byte)0);
-		
+		BuildIt.instance.getTaskRunner().submit(new DisplaySelectionTask(blocks, sel.getWorld(), player, true));
+
 		mDisplaying.put(player, blocks);
 	}
 	
@@ -394,13 +416,7 @@ public class SelectionManager implements Listener
 		if(blocks == null)
 			return;
 		
-		World world = player.getWorld();
-		
-		for(BlockVector block : blocks)
-		{
-			Block b = world.getBlockAt(block.getBlockX(), block.getBlockY(), block.getBlockZ());
-			player.sendBlockChange(block.toLocation(world), b.getType(), b.getData());
-		}
+		BuildIt.instance.getTaskRunner().submit(new DisplaySelectionTask(blocks, player.getWorld(), player, false));
 		
 		mDisplaying.remove(player);
 	}
@@ -511,4 +527,55 @@ public class SelectionManager implements Listener
 		}
 		
 	}
+	
+	private class DisplaySelectionTask implements IncrementalTask
+	{
+		private List<BlockVector> mBlocks;
+		private World mWorld;
+		private Player mPlayer;
+		private boolean mSet;
+		
+		private int mIndex;
+		
+		public DisplaySelectionTask(List<BlockVector> blocks, World world, Player player, boolean set)
+		{
+			mBlocks = blocks;
+			mWorld = world;
+			mPlayer = player;
+			mSet = set;
+			mIndex = 0;
+		}
+		@Override
+		public World getWorld()
+		{
+			return null;
+		}
+
+		@Override
+		public float doSome()
+		{
+			if(mIndex < mBlocks.size())
+			{
+				if(mSet)
+					mPlayer.sendBlockChange(mBlocks.get(mIndex++).toLocation(mWorld), Material.GOLD_BLOCK, (byte)0);
+				else
+				{
+					BlockVector block = mBlocks.get(mIndex++);
+					Block b = mWorld.getBlockAt(block.getBlockX(), block.getBlockY(), block.getBlockZ());
+					mPlayer.sendBlockChange(block.toLocation(mWorld), b.getType(), b.getData());
+				}
+			}
+			
+			return 0;
+		}
+
+		@Override
+		public boolean isDone()
+		{
+			return mIndex >= mBlocks.size();
+		}
+		
+	}
+	
+	
 }

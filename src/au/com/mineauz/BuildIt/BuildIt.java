@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,8 +25,13 @@ import au.com.mineauz.BuildIt.commands.ReplaceCommand;
 import au.com.mineauz.BuildIt.commands.SetCommand;
 import au.com.mineauz.BuildIt.commands.UndoCommand;
 import au.com.mineauz.BuildIt.commands.WandCommand;
-import au.com.mineauz.BuildIt.commands.generation.SphereCommand;
+import au.com.mineauz.BuildIt.commands.generation.GenerateCommand;
+import au.com.mineauz.BuildIt.commands.generation.GeneratorCommand;
+import au.com.mineauz.BuildIt.commands.generation.IGeneratorCommandHandler;
 import au.com.mineauz.BuildIt.drawing.DrawingManager;
+import au.com.mineauz.BuildIt.generation.HollowSphereGenerator;
+import au.com.mineauz.BuildIt.generation.IGenerator;
+import au.com.mineauz.BuildIt.generation.SphereGenerator;
 import au.com.mineauz.BuildIt.natives.NativeManager;
 import au.com.mineauz.BuildIt.selection.SelectionManager;
 import au.com.mineauz.BuildIt.tasks.IncrementalTaskRunner;
@@ -40,6 +48,8 @@ public class BuildIt extends JavaPlugin
 	private IncrementalTaskRunner mTaskRunner;
 	private UndoManager mUndoManager;
 	private ClipboardManager mClipboardManager;
+	
+	private GenerateCommand mGenerateCommand;
 	
 	public BuildIt()
 	{
@@ -81,7 +91,7 @@ public class BuildIt extends JavaPlugin
 		registerCommand("/expand", new ExpandCommand());
 		registerCommand("/chunk", new ChunkCommand());
 		
-		registerCommand("/sphere", new SphereCommand());
+		registerGenerators();
 		
 	}
 	
@@ -89,6 +99,9 @@ public class BuildIt extends JavaPlugin
 	public void onDisable()
 	{
 		mTaskRunner.cancelAll();
+		
+		mSelections.removeAllSelections();
+		mTaskRunner.forceAll();
 	}
 	
 	private void registerCommand(String name, ICommandDescription command)
@@ -107,6 +120,44 @@ public class BuildIt extends JavaPlugin
 		
 		cmd.setExecutor(command);
 		cmd.setTabCompleter(command);
+	}
+	
+	private void registerGenerator(Class<? extends IGenerator> generator)
+	{
+		for(Class<?> clazz : generator.getClasses())
+		{
+			if(clazz.isAnnotationPresent(GeneratorCommand.class) && IGeneratorCommandHandler.class.isAssignableFrom(clazz))
+			{
+				IGeneratorCommandHandler handler;
+				
+				try
+				{
+					handler = (IGeneratorCommandHandler)clazz.newInstance();
+					GeneratorCommand cmdInfo = clazz.getAnnotation(GeneratorCommand.class);
+					mGenerateCommand.register(cmdInfo.name(), cmdInfo.perm(), handler, cmdInfo.description(), cmdInfo.args());
+				}
+				catch(Exception e)
+				{
+					throw new RuntimeException("Unable to register generator command handler for " + generator.getSimpleName() + ".", e);
+				}
+			}
+		}
+	}
+	private void registerGenerators()
+	{
+		mGenerateCommand = new GenerateCommand();
+		Bukkit.getPluginManager().registerEvents(mGenerateCommand, this);
+		registerGenerator(SphereGenerator.class);
+		registerGenerator(HollowSphereGenerator.class);
+		
+		registerCommand("/generate", mGenerateCommand);
+	}
+	
+	@Override
+	public boolean onCommand( CommandSender sender, Command command,String label, String[] args )
+	{
+		// TODO Auto-generated method stub
+		return super.onCommand(sender, command, label, args);
 	}
 	
 	public SelectionManager getSelectionManager() { return mSelections; }

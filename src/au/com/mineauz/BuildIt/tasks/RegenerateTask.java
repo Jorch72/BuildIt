@@ -217,6 +217,12 @@ public class RegenerateTask implements IncrementalTask
 		return mIsDone;
 	}
 	
+	@Override
+	public World getWorld()
+	{
+		return mSelection.getWorld();
+	}
+	
 	private static class BiomeLookup implements BiomeGrid
 	{
 		private World mWorld;

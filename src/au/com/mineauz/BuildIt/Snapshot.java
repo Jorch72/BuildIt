@@ -48,9 +48,9 @@ public class Snapshot
 	/**
 	 * Replaces all of the snapshot back into the world
 	 */
-	public void restore()
+	public void restore(Runnable callback)
 	{
-		BuildIt.instance.getTaskRunner().submit(new SnapshotRestorer(true));
+		BuildIt.instance.getTaskRunner().submit(new SnapshotRestorer(true), callback);
 	}
 	
 	public void restoreImmediate()
@@ -102,6 +102,12 @@ public class Snapshot
 		public boolean isDone()
 		{
 			return !mProgress.hasNext();
+		}
+		
+		@Override
+		public World getWorld()
+		{
+			return mSelection.getWorld();
 		}
 
 	}
@@ -164,6 +170,12 @@ public class Snapshot
 		public boolean isDone()
 		{
 			return !mProgress.hasNext();
+		}
+		
+		@Override
+		public World getWorld()
+		{
+			return mSelection.getWorld();
 		}
 	}
 }
